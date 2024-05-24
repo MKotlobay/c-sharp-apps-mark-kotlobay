@@ -1,2 +1,17 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿global using global::System;
+global using global::System.Collections.Generic;
+global using global::System.IO;
+global using global::System.Linq;
+global using global::System.Net.Http;
+global using global::System.Threading;
+global using global::System.Threading.Tasks;
+using c_sharp_apps_mark_kotlobay.Shared;
+
+namespace c_sharp_apps_mark_kotlobay;
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        ProcessManager.RunMainProcess();
+    }
+}
