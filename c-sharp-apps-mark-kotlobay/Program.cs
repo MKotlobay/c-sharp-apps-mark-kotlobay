@@ -8,9 +8,9 @@ global using global::System.Threading.Tasks;
 using c_sharp_apps_mark_kotlobay.Shared;
 
 namespace c_sharp_apps_mark_kotlobay;
-internal class Program
+public class Program
 {
-    private static void Main(string[] args)
+    public static void Main(string[] args)
     {
         ProcessManager.RunMainProcess();
     }
