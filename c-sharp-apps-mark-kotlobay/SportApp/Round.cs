@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace c_sharp_apps_mark_kotlobay.SportApp
 {
-    public class SportAppMain
+    public class Round
     {
-        public static void MainEntry()
-        {
-            Console.WriteLine("SportApp");
+        private Game[] games;
 
-            TestSportApp.Test1();
+        public Round(int gamesAmount)
+        {
+            this.games = new Game[gamesAmount];
         }
     }
 }
