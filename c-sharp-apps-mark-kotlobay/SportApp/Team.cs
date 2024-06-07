@@ -43,6 +43,11 @@ namespace c_sharp_apps_mark_kotlobay.SportApp
         {
             Console.WriteLine("Name of team: " + this.name + " Has Amount of points: " + this.points);
         }
+
+        public string GetName()
+        {
+            return this.name;
+        }
     }
 
 }

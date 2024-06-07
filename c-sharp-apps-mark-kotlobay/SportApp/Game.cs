@@ -8,8 +8,8 @@ namespace c_sharp_apps_mark_kotlobay.SportApp
 {
     public class Game
     {
-        private Team[] groupA;
-        private Team[] groupB;
+        private Team groupA;
+        private Team groupB;
         private int groupAGoals;
         private int groupBGoals;
         private TimeOnly nowTime;
@@ -17,22 +17,13 @@ namespace c_sharp_apps_mark_kotlobay.SportApp
         private string groupsInfo; // Information about groups
         private string addionalInfo; // Addional information
 
-        public Game(Team[] groupA, Team[] groupB)
+        public Game(Team groupA, Team groupB)
         {
             this.groupA = groupA;
             this.groupB = groupB;
 
-            #region Counter for goals
-            int counterA = 0, counterB = 0;
-            for (int i = 0; i < groupA.Length; i++)
-                counterA += groupA[i].GetGoals();
-
-            for (int i = 0; i < groupB.Length; i++)
-                counterB += groupB[i].GetGoals();
-            #endregion Counter for goals
-
-            this.groupAGoals = counterA;
-            this.groupBGoals = counterB;
+            this.groupAGoals = 0;
+            this.groupBGoals = 0;
 
             this.nowTime = new TimeOnly();
             this.gameIsOn = true;
@@ -41,6 +32,22 @@ namespace c_sharp_apps_mark_kotlobay.SportApp
             this.groupsInfo = Console.ReadLine();
             Console.WriteLine("Any addional info ?");
             this.addionalInfo = Console.ReadLine();
+        }
+
+        public void ScoreGoal()
+        {
+            Console.WriteLine("Write A or B for the team who scored the goal");
+            string index = Console.ReadLine();
+
+            if (index == "B")
+                groupAGoals++;
+            else if (index == "B")
+                groupBGoals++;
+        }
+
+        public void FinishGame()
+        {
+            gameIsOn = false;
         }
     }
 }
