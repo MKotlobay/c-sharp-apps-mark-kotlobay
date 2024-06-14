@@ -11,7 +11,7 @@ namespace c_sharp_apps_mark_kotlobay.SportApp
     {
         public static void Teams()
         {
-            
+
         }
 
         private string name;
@@ -31,12 +31,18 @@ namespace c_sharp_apps_mark_kotlobay.SportApp
         {
             this.name = name;
             this.city = city;
+            this.goalsMandatory = 0; // Goals for - Been made by the team
+            this.goalsConceded = 0;
             //this.goalsDifferential = Math.Abs(goalsMandatory- goalsConceded);
         }
 
         public int GetGoals()
         {
             return this.goalsMandatory;
+        }
+        public int SetGoals(int goals)
+        {
+            return this.goalsMandatory = goals;
         }
 
         public void ToString()
