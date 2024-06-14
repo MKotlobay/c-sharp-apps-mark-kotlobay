@@ -11,6 +11,7 @@ namespace c_sharp_apps_mark_kotlobay.BankApp
         public static void MainEntry()
         {
             Console.WriteLine("BankApp");
+            TestAccount.Test1();
         }
     }
 }
