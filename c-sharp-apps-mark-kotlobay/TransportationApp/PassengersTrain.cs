@@ -12,13 +12,17 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         private int cronesAmount = 0;
 
         public PassengersTrain() { }
-        public PassengersTrain(Crone[] crones, int cronesAmount, int line, int id, int maxSpeed) : base(line, id, maxSpeed, 0)
+        public PassengersTrain(int line, int id, int maxSpeed, Crone crone, int cronesAmount) : base(line, id, maxSpeed, 0)
         {
-            this.crones = crones;
+            #region Crone builder
+            crones = new Crone[cronesAmount];
+            for (int i = 0; i < crones.Length; i++)
+            {
+                crones[i] = new Crone(crone);
+            }
+            #endregion End crone builder
+
             this.cronesAmount = cronesAmount;
-            Line = line;
-            Id = id;
-            MaxSpeed = maxSpeed;
             Seats = GetMaxPassengers();
         }
         public Crone[] Crones { get => crones; set => crones = value; }
@@ -45,18 +49,18 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         }
         public override void UploadPassengers(int num)
         {
-            int rejectedPassengers;
             if (CalculateHasRoom() == true)
             {
                 if (num + CurrentPassengers > GetMaxPassengers())
                 {
-                    int temp = GetMaxPassengers() - CurrentPassengers;
-                    rejectedPassengers = num - temp;
-                    CurrentPassengers = GetMaxPassengers();
+                    RejectedPassengers = (num + CurrentPassengers) - GetMaxPassengers();
+                    CurrentPassengers += num - RejectedPassengers;
+                    CalculateHasRoom();
                 }
                 else
                 {
                     CurrentPassengers += num;
+                    CalculateHasRoom();
                 }
             }
             else

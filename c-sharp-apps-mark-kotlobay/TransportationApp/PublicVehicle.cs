@@ -10,10 +10,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
     {
         private int line = 0;
         private int id = 0;
-        protected int maxSpeed = 0;
+        public int maxSpeed = 0;
         private int currentPassengers = 0;
         private int seats = 0;
         private bool hasRoom = true;
+        private int rejectedPassengers = 0;
 
         public PublicVehicle() { }
         public PublicVehicle(int line, int id, int maxSpeed, int seats)
@@ -35,9 +36,10 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         public int Line { get => line; set => line = value; }
         public int Id { get => id; set => id = value; }
         public virtual int MaxSpeed { get => maxSpeed; set { if (value <= 40) maxSpeed = value; } }
-        public int CurrentPassengers { get => currentPassengers; set { if (value <= seats) currentPassengers = value; } }
+        public int CurrentPassengers { get => currentPassengers; set { if (currentPassengers <= Seats) currentPassengers = value; } }
         public int Seats { get => seats; set => seats = value; }
-        public bool HasRoom { get => hasRoom; set { if (currentPassengers < seats) hasRoom = true; } }
+        public bool HasRoom { get => hasRoom; set { if (currentPassengers < seats) hasRoom = true; else hasRoom = false; } }
+        public int RejectedPassengers { get => rejectedPassengers; set => rejectedPassengers = value; }
         private int GetMaxPassengers() { return seats; }
         private bool CalculateHasRoom()
         {
@@ -51,14 +53,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         }
         public virtual void UploadPassengers(int num)
         {
-            int rejectedPassengers;
             if (CalculateHasRoom() == true)
             {
                 if (num + CurrentPassengers > GetMaxPassengers())
                 {
-                    int temp = GetMaxPassengers() - CurrentPassengers;
-                    rejectedPassengers = num - temp;
-                    CurrentPassengers = GetMaxPassengers();
+                    RejectedPassengers = (num + CurrentPassengers) - GetMaxPassengers();
+                    CurrentPassengers += num - RejectedPassengers;
                 }
                 else
                 {

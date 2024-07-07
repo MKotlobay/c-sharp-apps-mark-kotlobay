@@ -14,7 +14,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         private int columns;
 
         public PassengersAirplain() { }
-        public PassengersAirplain(int enginesNum, int wingLength, int rows, int columns, int line, int id) : base(line, id)
+        public PassengersAirplain(int line, int id, int enginesNum, int wingLength, int rows, int columns) : base(line, id)
         {
             this.enginesNum = enginesNum;
             this.wingLength = wingLength;
@@ -22,14 +22,14 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             this.columns = columns;
             Line = line;
             Id = id;
-            Seats = Rows * Columns;
+            Seats = GetMaxPassengers();
         }
         public int EnginesNum { get => enginesNum; set => enginesNum = value; }
         public int WingLength { get => wingLength; set => wingLength = value; }
         public int Rows { get => rows; set => rows = value; }
         public int Columns { get => columns; set => columns = value; }
         public override int MaxSpeed { get => maxSpeed; set { if (value <= 1000) maxSpeed = value; } }
-        private int GetMaxPassengers() { return Seats - 7; }
+        private int GetMaxPassengers() { return (this.rows * this.columns) - 7; }
         private bool CalculateHasRoom()
         {
             if (CurrentPassengers < GetMaxPassengers())
@@ -42,14 +42,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         }
         public override void UploadPassengers(int num)
         {
-            int rejectedPassengers;
             if (CalculateHasRoom() == true)
             {
                 if (num + CurrentPassengers > GetMaxPassengers())
                 {
-                    int temp = GetMaxPassengers() - CurrentPassengers;
-                    rejectedPassengers = num - temp;
-                    CurrentPassengers = GetMaxPassengers();
+                    RejectedPassengers = (num + CurrentPassengers) - GetMaxPassengers();
+                    CurrentPassengers += num-RejectedPassengers;
                 }
                 else
                 {

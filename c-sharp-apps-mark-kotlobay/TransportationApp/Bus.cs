@@ -12,10 +12,13 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         private bool bellStop = false;
 
         public Bus() { }
-        public Bus(int doors, bool bellStop, int line, int id, int maxSpeed, int seats) : base(line, id, maxSpeed, seats)
+        public Bus(int line, int id, int maxSpeed, int seats,int doors) : base(line, id, maxSpeed, seats)
         {
+            Line = line;
+            Id = id;
+            MaxSpeed = maxSpeed;
+            Seats = seats;
             this.doors = doors;
-            this.bellStop = bellStop;
         }
         public int Doors { get => doors; }
         public bool BellStop { get => bellStop; set => bellStop = value; }
@@ -38,14 +41,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         }
         public override void UploadPassengers(int num)
         {
-            int rejectedPassengers;
             if (CalculateHasRoom() == true)
             {
                 if (num + CurrentPassengers > GetMaxPassengers())
                 {
-                    int temp = GetMaxPassengers() - CurrentPassengers;
-                    rejectedPassengers = num - temp;
-                    CurrentPassengers = GetMaxPassengers();
+                    RejectedPassengers = (num + CurrentPassengers) - GetMaxPassengers();
+                    CurrentPassengers += num - RejectedPassengers;
                 }
                 else
                 {
