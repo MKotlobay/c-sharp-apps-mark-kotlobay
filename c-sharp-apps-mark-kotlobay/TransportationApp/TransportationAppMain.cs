@@ -11,6 +11,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         public static void MainEntry()
         {
             Console.WriteLine("TransportationApp");
+
+            MonitorTransportation monitor = new MonitorTransportation();
+            monitor.Test1();
         }
     }
 }
