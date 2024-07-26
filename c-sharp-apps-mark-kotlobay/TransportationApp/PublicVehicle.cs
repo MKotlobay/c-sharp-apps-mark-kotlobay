@@ -10,7 +10,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
     {
         private int line = 0;
         private int id = 0;
-        public int maxSpeed = 0;
+        protected int maxSpeed = 0;
         private int currentPassengers = 0;
         private int seats = 0;
         private bool hasRoom = true;
