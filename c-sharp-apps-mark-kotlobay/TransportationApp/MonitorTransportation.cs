@@ -204,5 +204,10 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
             Bus eged = new Bus(792, 3, 110, 40, 2); // Fifth object
         }
+
+        public void CargoTask()
+        {
+
+        }
     }
 }
