@@ -12,5 +12,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             : base(driver, maxWeight, maxVolume, itemsFromCargo, storageStructureParked, storageStructureToGo)
         {
         }
+
+        public void UnloadItems(StorageStructure destination)
+        {
+            destination.LoadItems(ItemsFromCargo);
+            ItemsFromCargo.Clear();
+        }
     }
 }

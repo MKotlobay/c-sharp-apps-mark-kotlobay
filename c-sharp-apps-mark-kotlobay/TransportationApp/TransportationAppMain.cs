@@ -13,7 +13,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             Console.WriteLine("TransportationApp");
 
             MonitorTransportation monitor = new MonitorTransportation();
-            monitor.Test1();
+            //monitor.Test1();
+            monitor.CargoTask();
         }
     }
 }

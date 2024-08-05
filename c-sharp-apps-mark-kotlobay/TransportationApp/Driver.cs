@@ -9,50 +9,57 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         FreightPlane,
         CargoShip
     }
+
     public class Driver
     {
         private string name;
         private string sureName;
         private string id;
-        protected DriverType VehicleType { get; private set; }
+        public DriverType VehicleType { get; private set; }
         public string? Destination { get; private set; }
         public bool IsOnWay { get; private set; }
 
-        public Driver(double cargoLength, double cargoWidth, double cargoHeight, double cargoCarryingWeight, string name, string sureName, string id, DriverType vehicleLicence)
+        public Driver(string name, string sureName, string id, DriverType vehicleLicence)
         {
             this.name = name;
             this.sureName = sureName;
             this.id = id;
             VehicleType = vehicleLicence;
-            this.Destination = null;
-            this.IsOnWay = false;
+            Destination = null;
+            IsOnWay = false;
         }
 
         public void Approve(string destination)
         {
-            if (VehicleType == DriverType.CargoCar && !IsOnWay)
+            if (!IsOnWay)
             {
                 Destination = destination;
                 IsOnWay = true;
-                Console.WriteLine($"Driver {this.name} {this.sureName} approved, next destination is: {Destination}");
+                Console.WriteLine($"Driver {name} {sureName} approved. Next destination: {Destination}");
             }
             else
             {
-                Console.WriteLine($"Driver {this.name} {this.sureName} cannot approve that destination. Current destination: {Destination}");
+                Console.WriteLine($"Driver {name} {sureName} cannot approve. Current destination: {Destination}");
             }
         }
 
-        public void OnWay()
+        public bool OnWay()
         {
-            if (this.IsOnWay)
-                Console.WriteLine($"{this.name} {this.sureName} is on the way to {this.Destination}");
+            if (IsOnWay)
+            {
+                Console.WriteLine($"{name} {sureName} is on the way to {Destination}");
+                return true;
+            }
             else
-                Console.WriteLine($"{this.name} {this.sureName} is free and waiting for a new destination");
+            {
+                Console.WriteLine($"{name} {sureName} is free and waiting for a new destination");
+                return false;
+            }
         }
 
         public override string ToString()
         {
-            return $"{this.name} {this.sureName} drives a {VehicleType.GetType().Name} with type {VehicleType.GetType().Name}";
+            return $"{name} {sureName} drives a {VehicleType}";
         }
     }
 }

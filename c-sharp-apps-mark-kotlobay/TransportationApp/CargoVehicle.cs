@@ -28,11 +28,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             StorageStructureParked = storageStructureParked;
             StorageStructureToGo = storageStructureToGo;
             ItemsFromCargo = itemsFromCargo;
-            CargoWeightCheck(ItemsFromCargo); // Sets CanDrive && IsOverWeight - Doing checks and updates by details
+            CargoWeightCheck(ItemsFromCargo);
             NextStorageStructure = null;
             CurrentDriveID = new Random().Next(1000, 10000);
-            ExpectedToPayed = ToPayed(itemsFromCargo); // Default distance of storageStructureParked from storageStructureToGo is 2000km
+            ExpectedToPayed = ToPayed(itemsFromCargo);
         }
+
         public void CargoWeightCheck(List<IPortable> itemsFromCargo)
         {
             double totalWeight = 0;
@@ -40,17 +41,10 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             {
                 totalWeight += item.Weight;
             }
-            if (totalWeight > MaxWeight)
-            {
-                IsOverWeight = true;
-                CanDrive = false;
-            }
-            else
-            {
-                IsOverWeight = false;
-                CanDrive = true;
-            }
+            IsOverWeight = totalWeight > MaxWeight;
+            CanDrive = !IsOverWeight;
         }
+
         public double ToPayed(List<IPortable> itemsFromCargo)
         {
             double totalWeight = 0;
@@ -61,15 +55,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 volume += item.Volume;
             }
             int distance = 2000; // 2000 km
-            return 1.2*(distance * totalWeight * volume);
+            return 1.2 * (distance * totalWeight * volume);
         }
+
         protected virtual bool CanLoad(IPortable item)
         {
-            if (item.Weight <= MaxWeight && item.Volume <= MaxVolume)
-            {
-                return true;
-            }
-            return false;
+            return item.Weight <= MaxWeight && item.Volume <= MaxVolume;
         }
     }
 }

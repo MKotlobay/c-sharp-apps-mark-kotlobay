@@ -16,6 +16,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected double CapacityVolume { get; set; }
         protected double WeightStored { get; set; }
         protected double VolumeStored { get; set; }
+
         protected StorageStructure(string country, string city, string street, int number, double capacityWeight, double capacityVolume)
         {
             Country = country;
