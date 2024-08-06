@@ -1,4 +1,5 @@
 ﻿using c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports;
+using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -211,13 +212,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         private List<Port> ports;
         private List<IPortable> items;
 
-        public MonitorTransportation()
-        {
-            BuildCargoApp();
-        }
-
         public void RunCargoTask()
         {
+            BuildCargoApp();
             while (true)
             {
                 Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 9 – Full details of all | 0 - Exit");
@@ -287,7 +284,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 new Port("USA", "Houston", "Harbor Street", 3, 220000, 110000, "Tertiary Port", 203)
             };
 
-            items = new List<IPortable>(); // Initialize with IPortable items if needed
+            items = new List<IPortable>();
+            items = GenerateRandomItems(items);
         }
 
         private void ChooseDestinationForDriver()
@@ -410,6 +408,50 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             {
                 Console.WriteLine(port.ToString());
             }
+        }
+        private List<IPortable> GenerateRandomItems(List<IPortable> existingItems)
+        {
+            Random rand = new Random();
+
+            // Generate 20 GeneralItems
+            for (int i = 0; i < 20; i++)
+            {
+                double length = rand.NextDouble() * 10;
+                double width = rand.NextDouble() * 10;
+                double height = rand.NextDouble() * 10;
+                double weight = rand.NextDouble() * 100;
+                double price = rand.NextDouble() * 1000;
+
+                existingItems.Add(new GeneralItem(length, width, height, weight, price));
+            }
+
+            // Generate 20 ElectricItems
+            for (int i = 0; i < 20; i++)
+            {
+                double length = rand.NextDouble() * 10;
+                double width = rand.NextDouble() * 10;
+                double height = rand.NextDouble() * 10;
+                double weight = rand.NextDouble() * 100;
+                double price = rand.NextDouble() * 1000;
+                double powerConsumption = rand.NextDouble() * 500;
+
+                existingItems.Add(new ElectricItem(length, width, height, weight, price, powerConsumption));
+            }
+
+            // Generate 20 FurnitureItems
+            for (int i = 0; i < 20; i++)
+            {
+                double length = rand.NextDouble() * 10;
+                double width = rand.NextDouble() * 10;
+                double height = rand.NextDouble() * 10;
+                double weight = rand.NextDouble() * 100;
+                double price = rand.NextDouble() * 1000;
+                string material = "Material" + rand.Next(1, 100); // Random material name
+
+                existingItems.Add(new FurnitureItem(length, width, height, weight, price, material));
+            }
+
+            return existingItems;
         }
     }
 }

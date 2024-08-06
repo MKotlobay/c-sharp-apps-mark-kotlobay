@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 {
@@ -15,8 +16,22 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 
         public void UnloadItems(StorageStructure destination)
         {
-            destination.LoadItems(ItemsFromCargo);
-            ItemsFromCargo.Clear();
+            if (IsReadyToTravel())
+            {
+                if (destination.Load(ItemsFromCargo))
+                {
+                    ItemsFromCargo.Clear();
+                    CargoWeightCheck(); // Ensure weight check after unloading
+                }
+                else
+                {
+                    Console.WriteLine("Failed to unload items.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Cargo ship is not ready to travel.");
+            }
         }
     }
 }

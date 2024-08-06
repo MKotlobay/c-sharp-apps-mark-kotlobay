@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 {
@@ -19,8 +20,15 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             Console.WriteLine($"Driving to {destination}");
 
             // Unload items at the destination
-            destination.LoadItems(ItemsFromCargo);
-            ItemsFromCargo.Clear();
+            if (destination.Load(ItemsFromCargo))
+            {
+                ItemsFromCargo.Clear();
+                CargoWeightCheck(); // Ensure weight check after unloading
+            }
+            else
+            {
+                Console.WriteLine("Failed to unload items.");
+            }
         }
     }
 }
