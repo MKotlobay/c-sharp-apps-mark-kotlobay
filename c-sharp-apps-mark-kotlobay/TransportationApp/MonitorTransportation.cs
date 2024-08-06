@@ -220,12 +220,14 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 9 – Full details of all | 0 - Exit");
                 if (!int.TryParse(Console.ReadLine(), out int num) || num < 0 || num > 9)
                 {
+                    Console.WriteLine("----------");
                     Console.WriteLine("Invalid input, please choose a valid action.");
                     continue;
                 }
 
                 if (num == 0)
                 {
+                    Console.WriteLine("----------");
                     Console.WriteLine("Exiting...");
                     break;
                 }
@@ -243,9 +245,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                     case 3:
                         LoadItemsInWarehouses();
                         break;
-
                     case 4:
-                        Console.WriteLine("Draft App functionality is not implemented yet.");
+                        UnloadItemsAtCurrentLocation();
+                        break;
+
+                    case 5:
+                        UnloadItemsAtDriversCurrentLocation();
                         break;
 
                     case 9:
@@ -290,6 +295,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         private void ChooseDestinationForDriver()
         {
+            Console.WriteLine("----------");
             Console.WriteLine("Choose a free driver (1 to 10):");
             if (int.TryParse(Console.ReadLine(), out int driverNum) && driverNum > 0 && driverNum <= drivers.Count)
             {
@@ -297,6 +303,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
                 if (!selectedDriver.OnWay())
                 {
+                    Console.WriteLine("----------");
                     Console.WriteLine("Choose a destination (1 - Port, 2 - Warehouse):");
                     if (int.TryParse(Console.ReadLine(), out int destinationType) && (destinationType == 1 || destinationType == 2))
                     {
@@ -311,48 +318,57 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                     }
                     else
                     {
+                        Console.WriteLine("----------");
                         Console.WriteLine("Invalid destination type.");
                     }
                 }
                 else
                 {
+                    Console.WriteLine("----------");
                     Console.WriteLine("Driver is already on the way.");
                 }
             }
             else
             {
+                Console.WriteLine("----------");
                 Console.WriteLine("Invalid driver number.");
             }
         }
 
         private void ChoosePort(Driver selectedDriver)
         {
+            Console.WriteLine("----------");
             Console.WriteLine("Choose a port (1 to 3):");
             if (int.TryParse(Console.ReadLine(), out int portNum) && portNum > 0 && portNum <= ports.Count)
             {
                 Port selectedPort = ports[portNum - 1];
                 selectedDriver.Approve(selectedPort.Name);
                 selectedDriver.OnWay();
+                Console.WriteLine("----------");
                 Console.WriteLine($"Driver {selectedDriver.ToString()} is now on the way to {selectedPort.Name}");
             }
             else
             {
+                Console.WriteLine("----------");
                 Console.WriteLine("Invalid port number.");
             }
         }
 
         private void ChooseWarehouse(Driver selectedDriver)
         {
+            Console.WriteLine("----------");
             Console.WriteLine("Choose a warehouse (1 to 2):");
             if (int.TryParse(Console.ReadLine(), out int warehouseNum) && warehouseNum > 0 && warehouseNum <= warehouses.Count)
             {
                 Warehouse selectedWarehouse = warehouses[warehouseNum - 1];
                 selectedDriver.Approve(selectedWarehouse.Name);
                 selectedDriver.OnWay();
+                Console.WriteLine("----------");
                 Console.WriteLine($"Driver {selectedDriver.ToString()} is now on the way to {selectedWarehouse.Name}");
             }
             else
             {
+                Console.WriteLine("----------");
                 Console.WriteLine("Invalid warehouse number.");
             }
         }
@@ -366,7 +382,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                     foreach (var port in ports)
                     {
                         driver.Approve(port.Name);
-                        // Assuming LoadItems() is implemented or handle the loading in a different way
+                        Console.WriteLine("----------");
                         Console.WriteLine($"Driver {driver.ToString()} has loaded items into {port.Name}");
                     }
                 }
@@ -382,27 +398,105 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                     foreach (var warehouse in warehouses)
                     {
                         driver.Approve(warehouse.Name);
-                        // Assuming LoadItems() is implemented or handle the loading in a different way
+                        Console.WriteLine("----------");
                         Console.WriteLine($"Driver {driver.ToString()} has loaded items into {warehouse.Name}");
                     }
                 }
             }
         }
+        private void UnloadItemsAtCurrentLocation()
+        {
+            foreach (var driver in drivers)
+            {
+                if (driver.OnWay())
+                {
+                    var location = driver.Located;
+                    if (location != null)
+                    {
+                        // Unloading based on cargo type
+                        switch (driver.VehicleType)
+                        {
+                            case DriverType.CargoCar:
+                                // Assuming CargoCar has UnloadItems method
+                                (driver.VehicleType as CargoCar)?.UnloadItems(location);
+                                break;
+
+                            case DriverType.FreightTrain:
+                                // Assuming FreightTrain has UnloadItems method
+                                (driver as FreightTrain)?.UnloadItems(location);
+                                break;
+
+                            case DriverType.FreightPlane:
+                                // Assuming FreightPlane has UnloadItems method
+                                (driver as FreightPlane)?.UnloadItems(location);
+                                break;
+
+                            case DriverType.CargoShip:
+                                // Assuming CargoShip has UnloadItems method
+                                (driver as CargoShip)?.UnloadItems(location);
+                                break;
+
+                            default:
+                                Console.WriteLine($"Driver {driver.ToString()} has an unknown cargo type.");
+                                break;
+                        }
+                        Console.WriteLine($"Driver {driver.ToString()} has unloaded items at {driver.Located}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Driver {driver.ToString()} is not currently at a valid location.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Driver {driver.ToString()} is not on the way.");
+                }
+            }
+        }
+
+        private void UnloadItemsAtDriversCurrentLocation()
+        {
+            foreach (var driver in drivers)
+            {
+                if (driver.OnWay())
+                {
+                    var destination = GetCurrentLocation(driver);
+                    if (destination != null)
+                    {
+                        destination.UnloadItems(driver.ItemsFromCargo);
+                        driver.ItemsFromCargo.Clear();
+                        Console.WriteLine($"Driver {driver.ToString()} has unloaded items at {destination.Name}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Driver {driver.ToString()} is not currently at a valid location.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Driver {driver.ToString()} is not on the way.");
+                }
+            }
+        }
+
 
         private void ShowAllDetails()
         {
+            Console.WriteLine("----------");
             Console.WriteLine("Details of all drivers:");
             foreach (var driver in drivers)
             {
                 Console.WriteLine(driver.ToString());
             }
 
+            Console.WriteLine("----------");
             Console.WriteLine("Details of all warehouses:");
             foreach (var warehouse in warehouses)
             {
                 Console.WriteLine(warehouse.ToString());
             }
 
+            Console.WriteLine("----------");
             Console.WriteLine("Details of all ports:");
             foreach (var port in ports)
             {

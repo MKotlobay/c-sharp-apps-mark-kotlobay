@@ -18,8 +18,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         public DriverType VehicleType { get; private set; }
         public string? Destination { get; private set; }
         public bool IsOnWay { get; private set; }
+        public string Located { get; set; }
 
-        public Driver(string name, string sureName, string id, DriverType vehicleLicence)
+        public Driver(string name, string sureName, string id, DriverType vehicleLicence, string located = "")
         {
             this.name = name;
             this.sureName = sureName;
@@ -27,6 +28,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             VehicleType = vehicleLicence;
             Destination = null;
             IsOnWay = false;
+            Located = located;
         }
 
         public void Approve(string destination)
