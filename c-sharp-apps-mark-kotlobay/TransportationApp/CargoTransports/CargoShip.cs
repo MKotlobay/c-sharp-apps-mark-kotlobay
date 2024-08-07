@@ -9,8 +9,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 {
     public class CargoShip : CargoVehicle
     {
-        public CargoShip(Driver driver, double maxWeight, double maxVolume, List<IPortable> itemsFromCargo, string storageStructureParked, string storageStructureToGo)
-            : base(driver, maxWeight, maxVolume, itemsFromCargo, storageStructureParked, storageStructureToGo)
+        public CargoShip(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
+            : base(driver, maxWeight, maxVolume, items, storageStructureParked, storageStructureToGo)
         {
         }
 
@@ -18,9 +18,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
         {
             if (IsReadyToTravel())
             {
-                if (destination.Load(ItemsFromCargo))
+                if (destination.Load(Items))
                 {
-                    ItemsFromCargo.Clear();
+                    Items.Clear();
                     CargoWeightCheck(); // Ensure weight check after unloading
                 }
                 else

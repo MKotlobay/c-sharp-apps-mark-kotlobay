@@ -10,214 +10,17 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 {
     public class MonitorTransportation
     {
-        public void Test1()
-        {
-            //TODO: 
-
-            //some tests:
-            // public PublicVehicle(int line, int id, int maxSpeed, int seats)
-            PublicVehicle p1 = new PublicVehicle(18, 8099065, 50, 80);
-            Bus bus = new Bus(1, 2033355, 110, 50, 3);//int line, int id, int maxSpeed, int seats, int doors
-            //int line, int id, int enginesNum, int wingLength, int rows, int columns
-            PassengersAirplain passengersAirplain1 = new PassengersAirplain(605, 987653, 4, 10, 60, 6);
-
-            Crone crone1 = new Crone(20, 5);
-            PassengersTrain passengersTrain1 = new PassengersTrain(65, 9998774, 250, crone1, 5);
-            bool allPassed = true;
-
-            //test max speed
-            if (p1.MaxSpeed != 0)
-            {
-                Console.WriteLine("Test 1 Error - Max Speed should be {0} but actual is {1}", 0, p1.MaxSpeed);
-                allPassed = false;
-            }
-            else
-            {
-                Console.WriteLine("Test 1 Passed ");
-
-            }
-
-            if (bus.MaxSpeed != 110)
-            {
-                Console.WriteLine("Test 2 Error - Max Speed should be {0} but actual is {1}", 110, bus.MaxSpeed);
-                allPassed = false;
-            }
-            else
-            {
-                Console.WriteLine("Test 2 Passed ");
-
-            }
-            bus.MaxSpeed = 200;
-
-            if (bus.MaxSpeed != 110)
-            {
-                Console.WriteLine("Test 3 Error - Max Speed should be {0} but actual is {1}", 110, bus.MaxSpeed);
-                allPassed = false;
-            }
-            else
-            {
-                Console.WriteLine("Test 3 Passed ");
-
-            }
-
-            //test uplod some passenger and the currentPassengers after. 
-
-            //cases that it's should be done. And not. 
-
-
-            passengersAirplain1.CurrentPassengers = 300;
-
-            passengersAirplain1.UploadPassengers(100);
-
-            if (passengersAirplain1.CurrentPassengers == 353 && passengersAirplain1.RejectedPassengers == 47)
-            {
-                Console.WriteLine("Test 4 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 4 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                    "And rejected should be {2} but actual is {3} ", 353, passengersAirplain1.CurrentPassengers,
-                    47, passengersAirplain1.RejectedPassengers);
-                allPassed = false;
-
-            }
-
-            bus.UploadPassengers(40);
-            bus.UploadPassengers(20);
-
-
-            if (bus.CurrentPassengers == 55 && bus.RejectedPassengers == 5)
-            {
-                Console.WriteLine("Test 5 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 5 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                  "And rejected should be {2} but actual is {3} ", 55, bus.CurrentPassengers,
-                  15, bus.RejectedPassengers);
-                allPassed = false;
-
-            }
-
-
-            if (passengersTrain1.Id == 9998774)
-            {
-                Console.WriteLine("Test 6 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 6 Error - id  should be {0} but actual is {1} "
-                   , 987653, passengersTrain1.Id);
-                allPassed = false;
-
-            }
-
-            passengersTrain1.UploadPassengers(300);
-
-            passengersTrain1.UploadPassengers(134);
-
-
-            if (passengersTrain1.CurrentPassengers == 434 && passengersTrain1.RejectedPassengers == 0)
-            {
-                Console.WriteLine("Test 7 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 7 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                  "And rejected should be {2} but actual is {3} ", 434, passengersTrain1.CurrentPassengers,
-                  0, passengersTrain1.RejectedPassengers);
-                allPassed = false;
-
-            }
-
-            passengersTrain1.UploadPassengers(405);
-
-
-            if (passengersTrain1.CurrentPassengers == 700 && passengersTrain1.RejectedPassengers == 139
-                && !passengersTrain1.HasRoom)
-            {
-                Console.WriteLine("Test 8 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 8 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                  "And rejected should be {2} but actual is {3} and HasRoom should be False, but actual is {4}", 700, passengersTrain1.CurrentPassengers,
-                  139, passengersTrain1.RejectedPassengers, passengersTrain1.HasRoom);
-                allPassed = false;
-
-            }
-
-
-            //Check that each crone is a different object...
-
-
-            if (passengersTrain1.Crones[0].Equals(passengersTrain1.Crones[1]))
-            {
-                Console.WriteLine("Test 9 Error - each crone of the train should be different instance. ");
-                allPassed = false;
-
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 9 Passed");
-
-            }
-
-
-
-            Console.WriteLine("\n*********************************\n");
-
-
-            if (allPassed)
-            {
-                Console.WriteLine("All TEST PASSED - WELL DONE!! \n" +
-                    "Yet it's not saying that everything work well. You should test yourself a little bit, also.");
-            }
-            else
-            {
-                Console.WriteLine("YOU HAVE FAILURES AT THE TESTS :( - SEE ABOVE");
-
-            }
-            Console.WriteLine("\n*********************************\n");
-        }
-
-        public void MyTest()
-        {
-            PublicVehicle tomCart = new PublicVehicle(1, 1, 35, 5); // First object
-
-            PassengersAirplain IL3245 = new PassengersAirplain(4, 10, 100, 4, 5, 300); // Second object
-
-            #region Train build
-            Crone crone = new Crone(50, 4);
-            PassengersTrain a = new PassengersTrain(100, 4, 280, crone, 4);
-            #endregion End train build
-
-            Bus eged = new Bus(792, 3, 110, 40, 2); // Fifth object
-        }
-
-        private List<Driver> drivers;
-        private List<Warehouse> warehouses;
-        private List<Port> ports;
-        private List<IPortable> items;
+        private List<Driver> Drivers;
+        private List<Warehouse> Warehouses;
+        private List<Port> Ports;
+        private List<IPortable> Items;
 
         public void RunCargoTask()
         {
             BuildCargoApp();
             while (true)
             {
-                Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 9 – Full details of all | 0 - Exit");
+                Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 4 - Unload all items in ports | 5 - Unload all items in warehouses | 9 – Full details of all | 0 - Exit");
                 if (!int.TryParse(Console.ReadLine(), out int num) || num < 0 || num > 9)
                 {
                     Console.WriteLine("----------");
@@ -245,13 +48,6 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                     case 3:
                         LoadItemsInWarehouses();
                         break;
-                    case 4:
-                        UnloadItemsAtCurrentLocation();
-                        break;
-
-                    case 5:
-                        UnloadItemsAtDriversCurrentLocation();
-                        break;
 
                     case 9:
                         ShowAllDetails();
@@ -262,44 +58,45 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         private void BuildCargoApp()
         {
-            drivers = new List<Driver>
+            Items = new List<IPortable>();
+
+            Drivers = new List<Driver>
             {
-                new Driver("John", "Doe", "123", DriverType.CargoCar),
-                new Driver("Jane", "Smith", "456", DriverType.FreightTrain),
-                new Driver("Jim", "Beam", "789", DriverType.FreightPlane),
-                new Driver("Jack", "Daniels", "101", DriverType.CargoShip),
-                new Driver("Johnny", "Walker", "102", DriverType.CargoCar),
-                new Driver("James", "Bond", "103", DriverType.FreightTrain),
-                new Driver("Tony", "Stark", "104", DriverType.FreightPlane),
-                new Driver("Steve", "Rogers", "105", DriverType.CargoShip),
-                new Driver("Bruce", "Wayne", "106", DriverType.CargoCar),
-                new Driver("Clark", "Kent", "107", DriverType.FreightTrain)
+                new Driver("John", "Doe", "123", DriverType.CargoCar, "Main Warehouse"),
+                new Driver("Jane", "Smith", "456", DriverType.FreightTrain, "Secondary Warehouse"),
+                new Driver("Jim", "Beam", "789", DriverType.FreightPlane, "Main Port"),
+                new Driver("Jack", "Daniels", "101", DriverType.CargoShip, "Secondary Port"),
+                new Driver("Johnny", "Walker", "102", DriverType.CargoCar, "Tertiary Port"),
+                new Driver("James", "Bond", "103", DriverType.FreightTrain, "Main Warehouse"),
+                new Driver("Tony", "Stark", "104", DriverType.FreightPlane, "Secondary Warehouse"),
+                new Driver("Steve", "Rogers", "105", DriverType.CargoShip, "Main Port"),
+                new Driver("Bruce", "Wayne", "106", DriverType.CargoCar, "Secondary Port"),
+                new Driver("Clark", "Kent", "107", DriverType.FreightTrain, "Tertiary Port")
             };
 
-            warehouses = new List<Warehouse>
+            Warehouses = new List<Warehouse>
             {
-                new Warehouse("USA", "New York", "5th Avenue", 1, 100000, 50000, "Main Warehouse", 101),
-                new Warehouse("USA", "Chicago", "Michigan Avenue", 2, 150000, 60000, "Secondary Warehouse", 102)
+                new Warehouse("USA", "New York", "5th Avenue", 1, 100000, 50000, GenerateRandomItems(Items), "Main Warehouse", 101),
+                new Warehouse("USA", "Chicago", "Michigan Avenue", 2, 150000, 60000,GenerateRandomItems(Items), "Secondary Warehouse", 102)
             };
 
-            ports = new List<Port>
+            Ports = new List<Port>
             {
-                new Port("USA", "Los Angeles", "Port Street", 1, 200000, 100000, "Main Port", 201),
-                new Port("USA", "San Francisco", "Bay Street", 2, 180000, 90000, "Secondary Port", 202),
-                new Port("USA", "Houston", "Harbor Street", 3, 220000, 110000, "Tertiary Port", 203)
+                new Port("USA", "Los Angeles", "Port Street", 1, 200000,GenerateRandomItems(Items), 100000, "Main Port", 201),
+                new Port("USA", "San Francisco", "Bay Street", 2, 180000,GenerateRandomItems(Items), 90000, "Secondary Port", 202),
+                new Port("USA", "Houston", "Harbor Street", 3, 220000, GenerateRandomItems(Items), 110000, "Tertiary Port", 203)
             };
 
-            items = new List<IPortable>();
-            items = GenerateRandomItems(items);
+            Items = GenerateRandomItems(Items);
         }
 
         private void ChooseDestinationForDriver()
         {
             Console.WriteLine("----------");
             Console.WriteLine("Choose a free driver (1 to 10):");
-            if (int.TryParse(Console.ReadLine(), out int driverNum) && driverNum > 0 && driverNum <= drivers.Count)
+            if (int.TryParse(Console.ReadLine(), out int driverNum) && driverNum > 0 && driverNum <= Drivers.Count)
             {
-                Driver selectedDriver = drivers[driverNum - 1];
+                Driver selectedDriver = Drivers[driverNum - 1];
 
                 if (!selectedDriver.OnWay())
                 {
@@ -339,13 +136,14 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         {
             Console.WriteLine("----------");
             Console.WriteLine("Choose a port (1 to 3):");
-            if (int.TryParse(Console.ReadLine(), out int portNum) && portNum > 0 && portNum <= ports.Count)
+            if (int.TryParse(Console.ReadLine(), out int portNum) && portNum > 0 && portNum <= Ports.Count)
             {
-                Port selectedPort = ports[portNum - 1];
+                Port selectedPort = Ports[portNum - 1];
                 selectedDriver.Approve(selectedPort.Name);
                 selectedDriver.OnWay();
                 Console.WriteLine("----------");
                 Console.WriteLine($"Driver {selectedDriver.ToString()} is now on the way to {selectedPort.Name}");
+                selectedDriver.Located = selectedPort.Name;
             }
             else
             {
@@ -358,13 +156,14 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         {
             Console.WriteLine("----------");
             Console.WriteLine("Choose a warehouse (1 to 2):");
-            if (int.TryParse(Console.ReadLine(), out int warehouseNum) && warehouseNum > 0 && warehouseNum <= warehouses.Count)
+            if (int.TryParse(Console.ReadLine(), out int warehouseNum) && warehouseNum > 0 && warehouseNum <= Warehouses.Count)
             {
-                Warehouse selectedWarehouse = warehouses[warehouseNum - 1];
+                Warehouse selectedWarehouse = Warehouses[warehouseNum - 1];
                 selectedDriver.Approve(selectedWarehouse.Name);
                 selectedDriver.OnWay();
                 Console.WriteLine("----------");
                 Console.WriteLine($"Driver {selectedDriver.ToString()} is now on the way to {selectedWarehouse.Name}");
+                selectedDriver.Located = selectedWarehouse.Name;
             }
             else
             {
@@ -375,107 +174,96 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         private void LoadItemsInPorts()
         {
-            foreach (var driver in drivers)
+            bool atLeastOnePortLoaded = false;
+
+            foreach (var driver in Drivers)
             {
-                if (driver.VehicleType == DriverType.CargoShip)
+                if (!driver.OnWay() && (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port"))
                 {
-                    foreach (var port in ports)
+                    foreach (var port in Ports)
                     {
-                        driver.Approve(port.Name);
-                        Console.WriteLine("----------");
-                        Console.WriteLine($"Driver {driver.ToString()} has loaded items into {port.Name}");
+                        // Check if the driver's location matches the port's name
+                        if (driver.Located == port.Name)
+                        {
+                            bool allLoaded = port.Load(driver.CargoVehicle.Items);
+
+                            if (allLoaded)
+                            {
+                                driver.CargoVehicle.Items.Clear(); // Clear items from driver's cargo after loading
+                                atLeastOnePortLoaded = true;
+                                Console.WriteLine("----------");
+                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {port.Name}");
+                            }
+                            else
+                            {
+                                Console.WriteLine("----------");
+                                Console.WriteLine($"Driver {driver.ToString()} could not load all items into {port.Name} because the port is full");
+                            }
+
+                            // Stop checking further ports for this driver if at least one port was successfully loaded
+                            break;
+                        }
                     }
                 }
+            }
+
+            if (!atLeastOnePortLoaded)
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("No available ports could load the items.");
             }
         }
 
         private void LoadItemsInWarehouses()
         {
-            foreach (var driver in drivers)
+            bool atLeastOneWarehouseLoaded = false;
+
+            foreach (var driver in Drivers)
             {
-                if (driver.VehicleType == DriverType.CargoCar)
+                if (!driver.OnWay() && (driver.Located == "Main Warehouse" || driver.Located == "Secondary Warehouse"))
                 {
-                    foreach (var warehouse in warehouses)
+                    foreach (var warehouse in Warehouses)
                     {
-                        driver.Approve(warehouse.Name);
-                        Console.WriteLine("----------");
-                        Console.WriteLine($"Driver {driver.ToString()} has loaded items into {warehouse.Name}");
-                    }
-                }
-            }
-        }
-        private void UnloadItemsAtCurrentLocation()
-        {
-            foreach (var driver in drivers)
-            {
-                if (driver.OnWay())
-                {
-                    var location = driver.Located;
-                    if (location != null)
-                    {
-                        // Unloading based on cargo type
-                        switch (driver.VehicleType)
+                        // Check if the driver's location matches the warehouse's name
+                        if (driver.Located == warehouse.Name)
                         {
-                            case DriverType.CargoCar:
-                                // Assuming CargoCar has UnloadItems method
-                                (driver.VehicleType as CargoCar)?.UnloadItems(location);
-                                break;
+                            // Ensure CargoVehicle and Items are not null
+                            if (driver.CargoVehicle != null)
+                            {
+                                var items = driver.CargoVehicle.Items; // Access the Items from CargoVehicle
 
-                            case DriverType.FreightTrain:
-                                // Assuming FreightTrain has UnloadItems method
-                                (driver as FreightTrain)?.UnloadItems(location);
-                                break;
+                                bool allLoaded = warehouse.Load(items);
 
-                            case DriverType.FreightPlane:
-                                // Assuming FreightPlane has UnloadItems method
-                                (driver as FreightPlane)?.UnloadItems(location);
-                                break;
+                                if (allLoaded)
+                                {
+                                    driver.CargoVehicle.Items.Clear(); // Clear items from driver's cargo after loading
+                                    atLeastOneWarehouseLoaded = true;
+                                    Console.WriteLine("----------");
+                                    Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {warehouse.Name}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("----------");
+                                    Console.WriteLine($"Driver {driver.ToString()} could not load all items into {warehouse.Name} because the warehouse is full");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("----------");
+                                Console.WriteLine($"Driver {driver.ToString()} does not have a CargoVehicle assigned.");
+                            }
 
-                            case DriverType.CargoShip:
-                                // Assuming CargoShip has UnloadItems method
-                                (driver as CargoShip)?.UnloadItems(location);
-                                break;
-
-                            default:
-                                Console.WriteLine($"Driver {driver.ToString()} has an unknown cargo type.");
-                                break;
+                            // Stop checking further warehouses for this driver if at least one warehouse was successfully loaded
+                            break;
                         }
-                        Console.WriteLine($"Driver {driver.ToString()} has unloaded items at {driver.Located}");
                     }
-                    else
-                    {
-                        Console.WriteLine($"Driver {driver.ToString()} is not currently at a valid location.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"Driver {driver.ToString()} is not on the way.");
                 }
             }
-        }
 
-        private void UnloadItemsAtDriversCurrentLocation()
-        {
-            foreach (var driver in drivers)
+            if (!atLeastOneWarehouseLoaded)
             {
-                if (driver.OnWay())
-                {
-                    var destination = GetCurrentLocation(driver);
-                    if (destination != null)
-                    {
-                        destination.UnloadItems(driver.ItemsFromCargo);
-                        driver.ItemsFromCargo.Clear();
-                        Console.WriteLine($"Driver {driver.ToString()} has unloaded items at {destination.Name}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Driver {driver.ToString()} is not currently at a valid location.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"Driver {driver.ToString()} is not on the way.");
-                }
+                Console.WriteLine("----------");
+                Console.WriteLine("No available warehouses could load the items.");
             }
         }
 
@@ -484,25 +272,26 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         {
             Console.WriteLine("----------");
             Console.WriteLine("Details of all drivers:");
-            foreach (var driver in drivers)
+            foreach (var driver in Drivers)
             {
-                Console.WriteLine(driver.ToString());
+                Console.WriteLine(driver.CargoVehicle.ToString());
             }
 
             Console.WriteLine("----------");
             Console.WriteLine("Details of all warehouses:");
-            foreach (var warehouse in warehouses)
+            foreach (var warehouse in Warehouses)
             {
                 Console.WriteLine(warehouse.ToString());
             }
 
             Console.WriteLine("----------");
             Console.WriteLine("Details of all ports:");
-            foreach (var port in ports)
+            foreach (var port in Ports)
             {
                 Console.WriteLine(port.ToString());
             }
         }
+
         private List<IPortable> GenerateRandomItems(List<IPortable> existingItems)
         {
             Random rand = new Random();

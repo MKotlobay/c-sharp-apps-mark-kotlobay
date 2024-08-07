@@ -17,8 +17,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected double CapacityVolume { get; set; }
         protected double WeightStored { get; set; }
         protected double VolumeStored { get; set; }
+        protected List<IPortable> Items { get; set; }
 
-        protected StorageStructure(string country, string city, string street, int number, double capacityWeight, double capacityVolume)
+        protected StorageStructure(string country, string city, string street, int number, double capacityWeight, double capacityVolume, List<IPortable> items)
         {
             Country = country;
             City = city;
@@ -28,9 +29,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             CapacityVolume = capacityVolume;
             WeightStored = 0;
             VolumeStored = 0;
+            Items = items;
         }
 
-        // Method to load items into the storage structure
         public bool Load(List<IPortable> items)
         {
             double totalWeight = items.Sum(item => item.Weight);
@@ -43,7 +44,6 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 VolumeStored += totalVolume;
                 return true; // Items loaded successfully
             }
-
             return false; // Not enough capacity to load items
         }
 
@@ -60,7 +60,6 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 VolumeStored -= totalVolume;
                 return true; // Items unloaded successfully
             }
-
             return false; // Items not found or other issue
         }
     }

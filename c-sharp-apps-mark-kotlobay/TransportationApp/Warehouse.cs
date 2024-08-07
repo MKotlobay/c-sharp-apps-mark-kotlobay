@@ -15,8 +15,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected double MaxCapacityVolume { get; set; }
         protected List<IPortable> InStorage { get; set; }
 
-        public Warehouse(string country, string city, string street, int number, double maxCapacityWeight, double maxCapacityVolume, string name, int numWarehouse)
-            : base(country, city, street, number, maxCapacityWeight, maxCapacityVolume)
+        public Warehouse(string country, string city, string street, int number, double maxCapacityWeight, double maxCapacityVolume, List<IPortable> items, string name, int numWarehouse)
+            : base(country, city, street, number, maxCapacityWeight, maxCapacityVolume, items)
         {
             Name = name;
             NumWarehouse = numWarehouse;

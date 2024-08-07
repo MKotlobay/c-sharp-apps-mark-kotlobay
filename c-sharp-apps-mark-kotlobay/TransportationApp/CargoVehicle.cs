@@ -15,20 +15,20 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected bool CanDrive { get; set; }
         protected bool IsOverWeight { get; set; }
         protected string? NextStorageStructure { get; set; }
-        protected List<IPortable> ItemsFromCargo { get; set; }
+        public List<IPortable> Items { get; set; }
         protected double ExpectedToPayed { get; set; }
         protected string StorageStructureParked { get; set; }
         protected string StorageStructureToGo { get; set; }
         protected int CurrentDriveID { get; private set; }
 
-        protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IPortable> itemsFromCargo, string storageStructureParked, string storageStructureToGo)
+        protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
         {
             Driver = driver;
             MaxWeight = maxWeight;
             MaxVolume = maxVolume;
             StorageStructureParked = storageStructureParked;
             StorageStructureToGo = storageStructureToGo;
-            ItemsFromCargo = itemsFromCargo ?? new List<IPortable>();
+            Items = items ?? new List<IPortable>();
             CargoWeightCheck();
             NextStorageStructure = null;
             CurrentDriveID = new Random().Next(1000, 10000);
@@ -38,7 +38,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         public void CargoWeightCheck()
         {
             double totalWeight = 0;
-            foreach (var item in ItemsFromCargo)
+            foreach (var item in Items)
             {
                 totalWeight += item.Weight;
             }
@@ -50,7 +50,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         {
             double totalWeight = 0;
             double volume = 0;
-            foreach (var item in ItemsFromCargo)
+            foreach (var item in Items)
             {
                 totalWeight += item.Weight;
                 volume += item.Volume;
@@ -61,8 +61,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         protected virtual bool CanLoad(IPortable item)
         {
-            double currentWeight = ItemsFromCargo.Sum(i => i.Weight);
-            double currentVolume = ItemsFromCargo.Sum(i => i.Volume);
+            double currentWeight = Items.Sum(i => i.Weight);
+            double currentVolume = Items.Sum(i => i.Volume);
 
             return (currentWeight + item.Weight <= MaxWeight) && (currentVolume + item.Volume <= MaxVolume);
         }
@@ -71,7 +71,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         {
             if (CanLoad(item))
             {
-                ItemsFromCargo.Add(item);
+                Items.Add(item);
                 CargoWeightCheck(); // Recalculate weight and volume after loading
                 return true;
             }
@@ -93,7 +93,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         public bool Unload(IPortable item)
         {
-            bool removed = ItemsFromCargo.Remove(item);
+            bool removed = Items.Remove(item);
             if (removed)
             {
                 CargoWeightCheck(); // Recalculate weight and volume after unloading
@@ -116,7 +116,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         public bool IsReadyToTravel()
         {
-            return ItemsFromCargo.Count > 0 && !IsOverWeight;
+            return Items.Count > 0 && !IsOverWeight;
+        }
+
+        public override string ToString()
+        {
+            return $"{Driver} is in charge of {Driver.VehicleType} with {CurrentDriveID} ID";
         }
     }
 }

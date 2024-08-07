@@ -9,8 +9,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 {
     public class FreightTrain : CargoVehicle
     {
-        public FreightTrain(Driver driver, double maxWeight, double maxVolume, List<IPortable> itemsFromCargo, string storageStructureParked, string storageStructureToGo)
-            : base(driver, maxWeight, maxVolume, itemsFromCargo, storageStructureParked, storageStructureToGo)
+        public FreightTrain(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
+            : base(driver, maxWeight, maxVolume, items, storageStructureParked, storageStructureToGo)
         {
         }
 
@@ -20,9 +20,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             Console.WriteLine($"Driving to {destination}");
 
             // Unload items at the destination
-            if (destination.Load(ItemsFromCargo))
+            if (destination.Load(Items))
             {
-                ItemsFromCargo.Clear();
+                Items.Clear();
                 CargoWeightCheck(); // Ensure weight check after unloading
             }
             else
