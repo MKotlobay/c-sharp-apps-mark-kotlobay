@@ -69,7 +69,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 new Driver("John", "Doe", "123", DriverType.CargoCar, "Main Warehouse", new List<IPortable>()),
                 new Driver("Jane", "Smith", "456", DriverType.FreightTrain, "Secondary Warehouse", new List<IPortable>()),
                 new Driver("Jim", "Beam", "789", DriverType.FreightPlane, "Main Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
-                new Driver("Jack", "Daniels", "101", DriverType.CargoShip, "Secondary Port", GenerateRandomItems(Items)),
+                new Driver("Jack", "Daniels", "101", DriverType.CargoShip, "Secondary Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
                 new Driver("Johnny", "Walker", "102", DriverType.CargoCar, "Tertiary Port", new List<IPortable>()),
                 new Driver("James", "Bond", "103", DriverType.FreightTrain, "Main Warehouse", new List<IPortable>()),
                 new Driver("Tony", "Stark", "104", DriverType.FreightPlane, "Secondary Warehouse", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
@@ -192,6 +192,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                             atLeastOnePortLoaded = true;
                             driver.CargoVehicle.Items.Clear();
                             driver.CargoVehicle.ClearWeightCargo();
+                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightPlane)
+                            {
+                                driver.CargoVehicle.Items = new List<IPortable>(GenerateRandomItems(new List<IPortable>())); // Used for resuply planes and ships
+                                driver.CargoVehicle.CalculateWeightCargo(driver.CargoVehicle.Items);
+                            }
                             Console.WriteLine("----------");
                             Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {port.Name}");
                         }
@@ -220,8 +225,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                             warehouse.Load(driver.CargoVehicle.Items);
                             atLeastOneWarehouseLoaded = true;
                             driver.CargoVehicle.Items.Clear();
-
                             driver.CargoVehicle.ClearWeightCargo();
+                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightPlane)
+                            {
+                                driver.CargoVehicle.Items = new List<IPortable>(GenerateRandomItems(new List<IPortable>())); // Used for resuply planes and ships
+                                driver.CargoVehicle.CalculateWeightCargo(driver.CargoVehicle.Items);
+                            }
                             Console.WriteLine("----------");
                             Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {warehouse.Name}");
                         }
