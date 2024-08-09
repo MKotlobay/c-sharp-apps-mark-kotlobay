@@ -20,7 +20,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             BuildCargoApp();
             while (true)
             {
-                Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 4 - Unload all items in ports | 5 - Unload all items in warehouses | 9 – Full details of all | 0 - Exit");
+                Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 4 - All ports load to drivers ! | 5 - All warehouses load to drivers ! | 9 – Full details of all | 0 - Exit");
                 if (!int.TryParse(Console.ReadLine(), out int num) || num < 0 || num > 9)
                 {
                     Console.WriteLine("----------");
@@ -49,6 +49,10 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                         LoadItemsInWarehouses();
                         break;
 
+                    case 4:
+                        UnloadAllItemsFromPorts();
+                        break;
+
                     case 9:
                         ShowAllDetails();
                         break;
@@ -62,29 +66,29 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
             Drivers = new List<Driver>
             {
-                new Driver("John", "Doe", "123", DriverType.CargoCar, "Main Warehouse"),
-                new Driver("Jane", "Smith", "456", DriverType.FreightTrain, "Secondary Warehouse"),
-                new Driver("Jim", "Beam", "789", DriverType.FreightPlane, "Main Port"),
-                new Driver("Jack", "Daniels", "101", DriverType.CargoShip, "Secondary Port"),
-                new Driver("Johnny", "Walker", "102", DriverType.CargoCar, "Tertiary Port"),
-                new Driver("James", "Bond", "103", DriverType.FreightTrain, "Main Warehouse"),
-                new Driver("Tony", "Stark", "104", DriverType.FreightPlane, "Secondary Warehouse"),
-                new Driver("Steve", "Rogers", "105", DriverType.CargoShip, "Main Port"),
-                new Driver("Bruce", "Wayne", "106", DriverType.CargoCar, "Secondary Port"),
-                new Driver("Clark", "Kent", "107", DriverType.FreightTrain, "Tertiary Port")
+                new Driver("John", "Doe", "123", DriverType.CargoCar, "Main Warehouse", new List<IPortable>()),
+                new Driver("Jane", "Smith", "456", DriverType.FreightTrain, "Secondary Warehouse", new List<IPortable>()),
+                new Driver("Jim", "Beam", "789", DriverType.FreightPlane, "Main Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Jack", "Daniels", "101", DriverType.CargoShip, "Secondary Port", GenerateRandomItems(Items)),
+                new Driver("Johnny", "Walker", "102", DriverType.CargoCar, "Tertiary Port", new List<IPortable>()),
+                new Driver("James", "Bond", "103", DriverType.FreightTrain, "Main Warehouse", new List<IPortable>()),
+                new Driver("Tony", "Stark", "104", DriverType.FreightPlane, "Secondary Warehouse", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Steve", "Rogers", "105", DriverType.CargoShip, "Main Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Bruce", "Wayne", "106", DriverType.CargoCar, "Secondary Port", new List<IPortable>()),
+                new Driver("Clark", "Kent", "107", DriverType.FreightTrain, "Tertiary Port", new List<IPortable>())
             };
 
             Warehouses = new List<Warehouse>
             {
-                new Warehouse("USA", "New York", "5th Avenue", 1, 100000, 50000, GenerateRandomItems(Items), "Main Warehouse", 101),
-                new Warehouse("USA", "Chicago", "Michigan Avenue", 2, 150000, 60000,GenerateRandomItems(Items), "Secondary Warehouse", 102)
+                new Warehouse("USA", "New York", "5th Avenue", 1, 100000, 50000, new List<IPortable>(GenerateRandomItems(new List<IPortable>())), "Main Warehouse", 101),
+                new Warehouse("USA", "Chicago", "Michigan Avenue", 2, 150000, 60000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), "Secondary Warehouse", 102)
             };
 
             Ports = new List<Port>
             {
-                new Port("USA", "Los Angeles", "Port Street", 1, 200000,GenerateRandomItems(Items), 100000, "Main Port", 201),
-                new Port("USA", "San Francisco", "Bay Street", 2, 180000,GenerateRandomItems(Items), 90000, "Secondary Port", 202),
-                new Port("USA", "Houston", "Harbor Street", 3, 220000, GenerateRandomItems(Items), 110000, "Tertiary Port", 203)
+                new Port("USA", "Los Angeles", "Port Street", 1, 200000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 100000, "Main Port", 201),
+                new Port("USA", "San Francisco", "Bay Street", 2, 180000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 90000, "Secondary Port", 202),
+                new Port("USA", "Houston", "Harbor Street", 3, 220000, new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 110000, "Tertiary Port", 203)
             };
 
             Items = GenerateRandomItems(Items);
@@ -178,39 +182,26 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
             foreach (var driver in Drivers)
             {
-                if (!driver.OnWay() && (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port"))
+                if (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port")
                 {
                     foreach (var port in Ports)
                     {
-                        // Check if the driver's location matches the port's name
                         if (driver.Located == port.Name)
                         {
-                            bool allLoaded = port.Load(driver.CargoVehicle.Items);
-
-                            if (allLoaded)
-                            {
-                                driver.CargoVehicle.Items.Clear(); // Clear items from driver's cargo after loading
-                                atLeastOnePortLoaded = true;
-                                Console.WriteLine("----------");
-                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {port.Name}");
-                            }
-                            else
-                            {
-                                Console.WriteLine("----------");
-                                Console.WriteLine($"Driver {driver.ToString()} could not load all items into {port.Name} because the port is full");
-                            }
-
-                            // Stop checking further ports for this driver if at least one port was successfully loaded
-                            break;
+                            port.Load(driver.CargoVehicle.Items);
+                            atLeastOnePortLoaded = true;
+                            driver.CargoVehicle.Items.Clear();
+                            driver.CargoVehicle.ClearWeightCargo();
+                            Console.WriteLine("----------");
+                            Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {port.Name}");
                         }
                     }
                 }
             }
-
             if (!atLeastOnePortLoaded)
             {
                 Console.WriteLine("----------");
-                Console.WriteLine("No available ports could load the items.");
+                Console.WriteLine("No available warehouse could load the items.");
             }
         }
 
@@ -220,50 +211,54 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
             foreach (var driver in Drivers)
             {
-                if (!driver.OnWay() && (driver.Located == "Main Warehouse" || driver.Located == "Secondary Warehouse"))
+                if (driver.Located == "Main Warehouse" || driver.Located == "Secondary Warehouse")
                 {
                     foreach (var warehouse in Warehouses)
                     {
-                        // Check if the driver's location matches the warehouse's name
                         if (driver.Located == warehouse.Name)
                         {
-                            // Ensure CargoVehicle and Items are not null
-                            if (driver.CargoVehicle != null)
-                            {
-                                var items = driver.CargoVehicle.Items; // Access the Items from CargoVehicle
+                            warehouse.Load(driver.CargoVehicle.Items);
+                            atLeastOneWarehouseLoaded = true;
+                            driver.CargoVehicle.Items.Clear();
 
-                                bool allLoaded = warehouse.Load(items);
-
-                                if (allLoaded)
-                                {
-                                    driver.CargoVehicle.Items.Clear(); // Clear items from driver's cargo after loading
-                                    atLeastOneWarehouseLoaded = true;
-                                    Console.WriteLine("----------");
-                                    Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {warehouse.Name}");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("----------");
-                                    Console.WriteLine($"Driver {driver.ToString()} could not load all items into {warehouse.Name} because the warehouse is full");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("----------");
-                                Console.WriteLine($"Driver {driver.ToString()} does not have a CargoVehicle assigned.");
-                            }
-
-                            // Stop checking further warehouses for this driver if at least one warehouse was successfully loaded
-                            break;
+                            driver.CargoVehicle.ClearWeightCargo();
+                            Console.WriteLine("----------");
+                            Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {warehouse.Name}");
                         }
                     }
                 }
             }
-
             if (!atLeastOneWarehouseLoaded)
             {
                 Console.WriteLine("----------");
-                Console.WriteLine("No available warehouses could load the items.");
+                Console.WriteLine("No available warehouse could load the items.");
+            }
+        }
+
+        private void UnloadAllItemsFromPorts()// Repair it
+        {
+            bool atLeastOnePortUnLoaded = false;
+
+            foreach (var driver in Drivers)
+            {
+                if (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port")
+                {
+                    foreach (var port in Ports)
+                    {
+                        if (driver.Located == port.Name)
+                        {
+                            driver.CargoVehicle.UnloadItems(port);
+                            atLeastOnePortUnLoaded = true;
+                            driver.CargoVehicle.Items.Clear();
+                            Console.WriteLine("----------");
+                            Console.WriteLine($"Driver {driver.ToString()} has successfully Unloaded all items from {port.Name}");
+                        }
+                    }
+                }
+            }
+            if (!atLeastOnePortUnLoaded)
+            {
+                Console.WriteLine("No items were unloaded.");
             }
         }
 
@@ -274,13 +269,15 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             Console.WriteLine("Details of all drivers:");
             foreach (var driver in Drivers)
             {
-                Console.WriteLine(driver.CargoVehicle.ToString());
+                Console.WriteLine("");
+                Console.WriteLine(driver.CargoVehicle.ToString() + " with current weight in cargo of " + driver.CargoVehicle.CurrentItemsWeightInCargo);
             }
 
             Console.WriteLine("----------");
             Console.WriteLine("Details of all warehouses:");
             foreach (var warehouse in Warehouses)
             {
+                Console.WriteLine("");
                 Console.WriteLine(warehouse.ToString());
             }
 
@@ -288,6 +285,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             Console.WriteLine("Details of all ports:");
             foreach (var port in Ports)
             {
+                Console.WriteLine("");
                 Console.WriteLine(port.ToString());
             }
         }

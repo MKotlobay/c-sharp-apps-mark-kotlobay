@@ -20,19 +20,46 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected string StorageStructureParked { get; set; }
         protected string StorageStructureToGo { get; set; }
         protected int CurrentDriveID { get; private set; }
+        public double CurrentItemsWeightInCargo { get; set; }
 
         protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
         {
             Driver = driver;
             MaxWeight = maxWeight;
             MaxVolume = maxVolume;
-            StorageStructureParked = storageStructureParked;
-            StorageStructureToGo = storageStructureToGo;
-            Items = items ?? new List<IPortable>();
+            StorageStructureParked = storageStructureParked; // Located now
+            StorageStructureToGo = storageStructureToGo; // Next location to drive
+            Items = items;
             CargoWeightCheck();
             NextStorageStructure = null;
             CurrentDriveID = new Random().Next(1000, 10000);
             ExpectedToPayed = ToPayed();
+            CalculateWeightCargo(items);
+        }
+        public void UnloadItems(StorageStructure destination)
+        {
+            if (destination.Load(Items))
+            {
+                Items.Clear();
+                CargoWeightCheck(); // Ensure weight check after unloading
+                Console.WriteLine($"Items successfully unloaded at {destination}.");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to unload items at {destination}.");
+            }
+        }
+        public void CalculateWeightCargo(List<IPortable> items)
+        {
+            foreach (var item in items)
+            {
+                CurrentItemsWeightInCargo += item.Weight;
+            }
+        }
+
+        public void ClearWeightCargo()
+        {
+            CurrentItemsWeightInCargo = 0;
         }
 
         public void CargoWeightCheck()
