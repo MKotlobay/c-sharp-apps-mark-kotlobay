@@ -1,4 +1,6 @@
-﻿using System;
+﻿using c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports;
+using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,201 +10,338 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 {
     public class MonitorTransportation
     {
-        public void Test1()
+        private List<Driver> Drivers;
+        private List<Warehouse> Warehouses;
+        private List<Port> Ports;
+        private List<IPortable> Items;
+
+        public void RunCargoTask()
         {
-            //TODO: 
-
-            //some tests:
-            // public PublicVehicle(int line, int id, int maxSpeed, int seats)
-            PublicVehicle p1 = new PublicVehicle(18, 8099065, 50, 80);
-            Bus bus = new Bus(1, 2033355, 110, 50, 3);//int line, int id, int maxSpeed, int seats, int doors
-            //int line, int id, int enginesNum, int wingLength, int rows, int columns
-            PassengersAirplain passengersAirplain1 = new PassengersAirplain(605, 987653, 4, 10, 60, 6);
-
-            Crone crone1 = new Crone(20, 5);
-            PassengersTrain passengersTrain1 = new PassengersTrain(65, 9998774, 250, crone1, 5);
-            bool allPassed = true;
-
-            //test max speed
-            if (p1.MaxSpeed != 0)
+            BuildCargoApp();
+            while (true)
             {
-                Console.WriteLine("Test 1 Error - Max Speed should be {0} but actual is {1}", 0, p1.MaxSpeed);
-                allPassed = false;
+                Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 4 - All ports load to drivers ! | 5 - All warehouses load to drivers ! | 9 – Full details of all | 0 - Exit");
+                if (!int.TryParse(Console.ReadLine(), out int num) || num < 0 || num > 9)
+                {
+                    Console.WriteLine("----------");
+                    Console.WriteLine("Invalid input, please choose a valid action.");
+                    continue;
+                }
+
+                if (num == 0)
+                {
+                    Console.WriteLine("----------");
+                    Console.WriteLine("Exiting...");
+                    break;
+                }
+
+                switch (num)
+                {
+                    case 1:
+                        ChooseDestinationForDriver();
+                        break;
+
+                    case 2:
+                        LoadItemsInPorts();
+                        break;
+
+                    case 3:
+                        LoadItemsInWarehouses();
+                        break;
+
+                    case 4:
+                        UnloadAllItemsFromPorts();
+                        break;
+
+                    case 9:
+                        ShowAllDetails();
+                        break;
+                }
             }
-            else
-            {
-                Console.WriteLine("Test 1 Passed ");
-
-            }
-
-            if (bus.MaxSpeed != 110)
-            {
-                Console.WriteLine("Test 2 Error - Max Speed should be {0} but actual is {1}", 110, bus.MaxSpeed);
-                allPassed = false;
-            }
-            else
-            {
-                Console.WriteLine("Test 2 Passed ");
-
-            }
-            bus.MaxSpeed = 200;
-
-            if (bus.MaxSpeed != 110)
-            {
-                Console.WriteLine("Test 3 Error - Max Speed should be {0} but actual is {1}", 110, bus.MaxSpeed);
-                allPassed = false;
-            }
-            else
-            {
-                Console.WriteLine("Test 3 Passed ");
-
-            }
-
-            //test uplod some passenger and the currentPassengers after. 
-
-            //cases that it's should be done. And not. 
-
-
-            passengersAirplain1.CurrentPassengers = 300;
-
-            passengersAirplain1.UploadPassengers(100);
-
-            if (passengersAirplain1.CurrentPassengers == 353 && passengersAirplain1.RejectedPassengers == 47)
-            {
-                Console.WriteLine("Test 4 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 4 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                    "And rejected should be {2} but actual is {3} ", 353, passengersAirplain1.CurrentPassengers,
-                    47, passengersAirplain1.RejectedPassengers);
-                allPassed = false;
-
-            }
-
-            bus.UploadPassengers(40);
-            bus.UploadPassengers(20);
-
-
-            if (bus.CurrentPassengers == 55 && bus.RejectedPassengers == 5)
-            {
-                Console.WriteLine("Test 5 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 5 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                  "And rejected should be {2} but actual is {3} ", 55, bus.CurrentPassengers,
-                  15, bus.RejectedPassengers);
-                allPassed = false;
-
-            }
-
-
-            if (passengersTrain1.Id == 9998774)
-            {
-                Console.WriteLine("Test 6 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 6 Error - id  should be {0} but actual is {1} "
-                   , 987653, passengersTrain1.Id);
-                allPassed = false;
-
-            }
-
-            passengersTrain1.UploadPassengers(300);
-
-            passengersTrain1.UploadPassengers(134);
-
-
-            if (passengersTrain1.CurrentPassengers == 434 && passengersTrain1.RejectedPassengers == 0)
-            {
-                Console.WriteLine("Test 7 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 7 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                  "And rejected should be {2} but actual is {3} ", 434, passengersTrain1.CurrentPassengers,
-                  0, passengersTrain1.RejectedPassengers);
-                allPassed = false;
-
-            }
-
-            passengersTrain1.UploadPassengers(405);
-
-
-            if (passengersTrain1.CurrentPassengers == 700 && passengersTrain1.RejectedPassengers == 139
-                && !passengersTrain1.HasRoom)
-            {
-                Console.WriteLine("Test 8 Passed ");
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 8 Error - CurrentPassengers should be {0} but actual is {1} \n" +
-                  "And rejected should be {2} but actual is {3} and HasRoom should be False, but actual is {4}", 700, passengersTrain1.CurrentPassengers,
-                  139, passengersTrain1.RejectedPassengers, passengersTrain1.HasRoom);
-                allPassed = false;
-
-            }
-
-
-            //Check that each crone is a different object...
-
-
-            if (passengersTrain1.Crones[0].Equals(passengersTrain1.Crones[1]))
-            {
-                Console.WriteLine("Test 9 Error - each crone of the train should be different instance. ");
-                allPassed = false;
-
-
-            }
-            else
-            {
-
-                Console.WriteLine("Test 9 Passed");
-
-            }
-
-
-
-            Console.WriteLine("\n*********************************\n");
-
-
-            if (allPassed)
-            {
-                Console.WriteLine("All TEST PASSED - WELL DONE!! \n" +
-                    "Yet it's not saying that everything work well. You should test yourself a little bit, also.");
-            }
-            else
-            {
-                Console.WriteLine("YOU HAVE FAILURES AT THE TESTS :( - SEE ABOVE");
-
-            }
-            Console.WriteLine("\n*********************************\n");
         }
 
-        public void MyTest()
+        private void BuildCargoApp()
         {
-            PublicVehicle tomCart = new PublicVehicle(1, 1, 35, 5); // First object
+            Items = new List<IPortable>();
 
-            PassengersAirplain IL3245 = new PassengersAirplain(4, 10, 100, 4, 5, 300); // Second object
+            Drivers = new List<Driver>
+            {
+                new Driver("John", "Doe", "123", DriverType.CargoCar, "Main Warehouse", new List<IPortable>()),
+                new Driver("Jane", "Smith", "456", DriverType.FreightTrain, "Secondary Warehouse", new List<IPortable>()),
+                new Driver("Jim", "Beam", "789", DriverType.FreightPlane, "Main Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Jack", "Daniels", "101", DriverType.CargoShip, "Secondary Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Johnny", "Walker", "102", DriverType.CargoCar, "Tertiary Port", new List<IPortable>()),
+                new Driver("James", "Bond", "103", DriverType.FreightTrain, "Main Warehouse", new List<IPortable>()),
+                new Driver("Tony", "Stark", "104", DriverType.FreightPlane, "Secondary Warehouse", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Steve", "Rogers", "105", DriverType.CargoShip, "Main Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Bruce", "Wayne", "106", DriverType.CargoCar, "Secondary Port", new List<IPortable>()),
+                new Driver("Clark", "Kent", "107", DriverType.FreightTrain, "Tertiary Port", new List<IPortable>())
+            };
 
-            #region Train build
-            Crone crone = new Crone(50, 4);
-            PassengersTrain a = new PassengersTrain(100,4,280,crone,4);
-            #endregion End train build
+            Warehouses = new List<Warehouse>
+            {
+                new Warehouse("USA", "New York", "5th Avenue", 1, 100000, 50000, new List<IPortable>(GenerateRandomItems(new List<IPortable>())), "Main Warehouse", 101),
+                new Warehouse("USA", "Chicago", "Michigan Avenue", 2, 150000, 60000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), "Secondary Warehouse", 102)
+            };
 
-            Bus eged = new Bus(792, 3, 110, 40, 2); // Fifth object
+            Ports = new List<Port>
+            {
+                new Port("USA", "Los Angeles", "Port Street", 1, 200000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 100000, "Main Port", 201),
+                new Port("USA", "San Francisco", "Bay Street", 2, 180000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 90000, "Secondary Port", 202),
+                new Port("USA", "Houston", "Harbor Street", 3, 220000, new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 110000, "Tertiary Port", 203)
+            };
+
+            Items = GenerateRandomItems(Items);
+        }
+
+        private void ChooseDestinationForDriver()
+        {
+            Console.WriteLine("----------");
+            Console.WriteLine("Choose a free driver (1 to 10):");
+            if (int.TryParse(Console.ReadLine(), out int driverNum) && driverNum > 0 && driverNum <= Drivers.Count)
+            {
+                Driver selectedDriver = Drivers[driverNum - 1];
+
+                if (!selectedDriver.OnWay())
+                {
+                    Console.WriteLine("----------");
+                    Console.WriteLine("Choose a destination (1 - Port, 2 - Warehouse):");
+                    if (int.TryParse(Console.ReadLine(), out int destinationType) && (destinationType == 1 || destinationType == 2))
+                    {
+                        if (destinationType == 1)
+                        {
+                            ChoosePort(selectedDriver);
+                        }
+                        else if (destinationType == 2)
+                        {
+                            ChooseWarehouse(selectedDriver);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("----------");
+                        Console.WriteLine("Invalid destination type.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("----------");
+                    Console.WriteLine("Driver is already on the way.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("Invalid driver number.");
+            }
+        }
+
+        private void ChoosePort(Driver selectedDriver)
+        {
+            Console.WriteLine("----------");
+            Console.WriteLine("Choose a port (1 to 3):");
+            if (int.TryParse(Console.ReadLine(), out int portNum) && portNum > 0 && portNum <= Ports.Count)
+            {
+                Port selectedPort = Ports[portNum - 1];
+                selectedDriver.Approve(selectedPort.Name);
+                selectedDriver.OnWay();
+                Console.WriteLine("----------");
+                Console.WriteLine($"Driver {selectedDriver.ToString()} is now on the way to {selectedPort.Name}");
+                selectedDriver.Located = selectedPort.Name;
+            }
+            else
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("Invalid port number.");
+            }
+        }
+
+        private void ChooseWarehouse(Driver selectedDriver)
+        {
+            Console.WriteLine("----------");
+            Console.WriteLine("Choose a warehouse (1 to 2):");
+            if (int.TryParse(Console.ReadLine(), out int warehouseNum) && warehouseNum > 0 && warehouseNum <= Warehouses.Count)
+            {
+                Warehouse selectedWarehouse = Warehouses[warehouseNum - 1];
+                selectedDriver.Approve(selectedWarehouse.Name);
+                selectedDriver.OnWay();
+                Console.WriteLine("----------");
+                Console.WriteLine($"Driver {selectedDriver.ToString()} is now on the way to {selectedWarehouse.Name}");
+                selectedDriver.Located = selectedWarehouse.Name;
+            }
+            else
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("Invalid warehouse number.");
+            }
+        }
+
+        private void LoadItemsInPorts()
+        {
+            bool atLeastOnePortLoaded = false;
+
+            foreach (var driver in Drivers)
+            {
+                if (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port")
+                {
+                    foreach (var port in Ports)
+                    {
+                        if (driver.Located == port.Name)
+                        {
+                            port.Load(driver.CargoVehicle.Items);
+                            atLeastOnePortLoaded = true;
+                            driver.CargoVehicle.Items.Clear();
+                            driver.CargoVehicle.ClearWeightCargo();
+                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightPlane)
+                            {
+                                driver.CargoVehicle.Items = new List<IPortable>(GenerateRandomItems(new List<IPortable>())); // Used for resuply planes and ships
+                                driver.CargoVehicle.CalculateWeightCargo(driver.CargoVehicle.Items);
+                            }
+                            Console.WriteLine("----------");
+                            Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {port.Name}");
+                        }
+                    }
+                }
+            }
+            if (!atLeastOnePortLoaded)
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("No available warehouse could load the items.");
+            }
+        }
+
+        private void LoadItemsInWarehouses()
+        {
+            bool atLeastOneWarehouseLoaded = false;
+
+            foreach (var driver in Drivers)
+            {
+                if (driver.Located == "Main Warehouse" || driver.Located == "Secondary Warehouse")
+                {
+                    foreach (var warehouse in Warehouses)
+                    {
+                        if (driver.Located == warehouse.Name)
+                        {
+                            warehouse.Load(driver.CargoVehicle.Items);
+                            atLeastOneWarehouseLoaded = true;
+                            driver.CargoVehicle.Items.Clear();
+                            driver.CargoVehicle.ClearWeightCargo();
+                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightPlane)
+                            {
+                                driver.CargoVehicle.Items = new List<IPortable>(GenerateRandomItems(new List<IPortable>())); // Used for resuply planes and ships
+                                driver.CargoVehicle.CalculateWeightCargo(driver.CargoVehicle.Items);
+                            }
+                            Console.WriteLine("----------");
+                            Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {warehouse.Name}");
+                        }
+                    }
+                }
+            }
+            if (!atLeastOneWarehouseLoaded)
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("No available warehouse could load the items.");
+            }
+        }
+
+        private void UnloadAllItemsFromPorts()// Repair it
+        {
+            bool atLeastOnePortUnLoaded = false;
+
+            foreach (var driver in Drivers)
+            {
+                if (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port")
+                {
+                    foreach (var port in Ports)
+                    {
+                        if (driver.Located == port.Name)
+                        {
+                            driver.CargoVehicle.UnloadItems(port);
+                            atLeastOnePortUnLoaded = true;
+                            driver.CargoVehicle.Items.Clear();
+                            Console.WriteLine("----------");
+                            Console.WriteLine($"Driver {driver.ToString()} has successfully Unloaded all items from {port.Name}");
+                        }
+                    }
+                }
+            }
+            if (!atLeastOnePortUnLoaded)
+            {
+                Console.WriteLine("No items were unloaded.");
+            }
+        }
+
+
+        private void ShowAllDetails()
+        {
+            Console.WriteLine("----------");
+            Console.WriteLine("Details of all drivers:");
+            foreach (var driver in Drivers)
+            {
+                Console.WriteLine("");
+                Console.WriteLine(driver.CargoVehicle.ToString() + " with current weight in cargo of " + driver.CargoVehicle.CurrentItemsWeightInCargo);
+            }
+
+            Console.WriteLine("----------");
+            Console.WriteLine("Details of all warehouses:");
+            foreach (var warehouse in Warehouses)
+            {
+                Console.WriteLine("");
+                Console.WriteLine(warehouse.ToString());
+            }
+
+            Console.WriteLine("----------");
+            Console.WriteLine("Details of all ports:");
+            foreach (var port in Ports)
+            {
+                Console.WriteLine("");
+                Console.WriteLine(port.ToString());
+            }
+        }
+
+        private List<IPortable> GenerateRandomItems(List<IPortable> existingItems)
+        {
+            Random rand = new Random();
+
+            // Generate 20 GeneralItems
+            for (int i = 0; i < 20; i++)
+            {
+                double length = rand.NextDouble() * 10;
+                double width = rand.NextDouble() * 10;
+                double height = rand.NextDouble() * 10;
+                double weight = rand.NextDouble() * 100;
+                double price = rand.NextDouble() * 1000;
+
+                existingItems.Add(new GeneralItem(length, width, height, weight, price));
+            }
+
+            // Generate 20 ElectricItems
+            for (int i = 0; i < 20; i++)
+            {
+                double length = rand.NextDouble() * 10;
+                double width = rand.NextDouble() * 10;
+                double height = rand.NextDouble() * 10;
+                double weight = rand.NextDouble() * 100;
+                double price = rand.NextDouble() * 1000;
+                double powerConsumption = rand.NextDouble() * 500;
+
+                existingItems.Add(new ElectricItem(length, width, height, weight, price, powerConsumption));
+            }
+
+            // Generate 20 FurnitureItems
+            for (int i = 0; i < 20; i++)
+            {
+                double length = rand.NextDouble() * 10;
+                double width = rand.NextDouble() * 10;
+                double height = rand.NextDouble() * 10;
+                double weight = rand.NextDouble() * 100;
+                double price = rand.NextDouble() * 1000;
+                string material = "Material" + rand.Next(1, 100); // Random material name
+
+                existingItems.Add(new FurnitureItem(length, width, height, weight, price, material));
+            }
+
+            return existingItems;
         }
     }
 }
