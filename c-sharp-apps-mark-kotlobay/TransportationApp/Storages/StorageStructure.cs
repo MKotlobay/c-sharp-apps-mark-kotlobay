@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace c_sharp_apps_mark_kotlobay.TransportationApp
+namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
 {
     public abstract class StorageStructure
     {
@@ -38,7 +38,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             double totalVolume = items.Sum(item => item.Volume);
 
             // Check if there is enough capacity to load the items
-            if ((WeightStored + totalWeight <= CapacityWeight) && (VolumeStored + totalVolume <= CapacityVolume))
+            if (WeightStored + totalWeight <= CapacityWeight && VolumeStored + totalVolume <= CapacityVolume)
             {
                 WeightStored += totalWeight;
                 VolumeStored += totalVolume;
@@ -54,7 +54,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             double totalVolume = items.Sum(item => item.Volume);
 
             // Check if the items are already in the storage
-            if ((WeightStored - totalWeight >= 0) && (VolumeStored - totalVolume >= 0))
+            if (WeightStored - totalWeight >= 0 && VolumeStored - totalVolume >= 0)
             {
                 WeightStored -= totalWeight;
                 VolumeStored -= totalVolume;

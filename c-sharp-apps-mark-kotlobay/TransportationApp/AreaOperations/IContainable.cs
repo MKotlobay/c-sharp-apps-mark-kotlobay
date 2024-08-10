@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 
-namespace c_sharp_apps_mark_kotlobay.TransportationApp
+namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
 {
     public interface IContainable
     {

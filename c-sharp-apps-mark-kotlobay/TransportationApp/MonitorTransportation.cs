@@ -1,10 +1,13 @@
-﻿using c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports;
+﻿using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
+using c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
+using c_sharp_apps_mark_kotlobay.TransportationApp.Storages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations.Crane;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp
 {
@@ -13,6 +16,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         private List<Driver> Drivers;
         private List<Warehouse> Warehouses;
         private List<Port> Ports;
+        private List<Crane> Cranes;
         private List<IPortable> Items;
 
         public void RunCargoTask()
@@ -191,11 +195,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                             port.Load(driver.CargoVehicle.Items);
                             atLeastOnePortLoaded = true;
                             driver.CargoVehicle.Items.Clear();
-                            driver.CargoVehicle.ClearWeightCargo();
-                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightPlane)
+                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightTrain)
                             {
                                 driver.CargoVehicle.Items = new List<IPortable>(GenerateRandomItems(new List<IPortable>())); // Used for resuply planes and ships
-                                driver.CargoVehicle.CalculateWeightCargo(driver.CargoVehicle.Items);
                             }
                             Console.WriteLine("----------");
                             Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {port.Name}");
@@ -225,11 +227,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                             warehouse.Load(driver.CargoVehicle.Items);
                             atLeastOneWarehouseLoaded = true;
                             driver.CargoVehicle.Items.Clear();
-                            driver.CargoVehicle.ClearWeightCargo();
-                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightPlane)
+                            if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightTrain)
                             {
                                 driver.CargoVehicle.Items = new List<IPortable>(GenerateRandomItems(new List<IPortable>())); // Used for resuply planes and ships
-                                driver.CargoVehicle.CalculateWeightCargo(driver.CargoVehicle.Items);
                             }
                             Console.WriteLine("----------");
                             Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {warehouse.Name}");
@@ -244,30 +244,40 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             }
         }
 
-        private void UnloadAllItemsFromPorts()// Repair it
+        private void UnloadAllItemsFromPorts()
         {
             bool atLeastOnePortUnLoaded = false;
 
             foreach (var driver in Drivers)
             {
+                // Check if the driver is currently located at a port
                 if (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port")
                 {
                     foreach (var port in Ports)
                     {
-                        if (driver.Located == port.Name)
+                        // Check if the driver's current location matches the port and if the vehicle type is CargoShip or FreightTrain
+                        if (driver.Located == port.Name && (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightTrain))
                         {
-                            driver.CargoVehicle.UnloadItems(port);
+                            // Use the crane to unload the items from the vehicle at the port
+                            
+                            port.Crane.Unload(driver.CargoVehicle.Items);
                             atLeastOnePortUnLoaded = true;
+
+                            // Clear the driver's cargo items after unloading
                             driver.CargoVehicle.Items.Clear();
+                            driver.CargoVehicle.ClearWeightCargo();
+
                             Console.WriteLine("----------");
-                            Console.WriteLine($"Driver {driver.ToString()} has successfully Unloaded all items from {port.Name}");
+                            Console.WriteLine($"Driver {driver.ToString()} has successfully unloaded all containers at {port.Name} using a crane.");
                         }
                     }
                 }
             }
+
             if (!atLeastOnePortUnLoaded)
             {
-                Console.WriteLine("No items were unloaded.");
+                Console.WriteLine("----------");
+                Console.WriteLine("No items were unloaded from any ports.");
             }
         }
 

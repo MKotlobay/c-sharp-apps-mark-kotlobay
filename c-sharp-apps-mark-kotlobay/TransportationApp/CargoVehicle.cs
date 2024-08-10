@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
+using c_sharp_apps_mark_kotlobay.TransportationApp.Storages;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp
 {
@@ -34,62 +36,61 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             NextStorageStructure = null;
             CurrentDriveID = new Random().Next(1000, 10000);
             ExpectedToPayed = ToPayed();
-            CalculateWeightCargo(items);
         }
+
         public void UnloadItems(StorageStructure destination)
         {
             if (destination.Load(Items))
             {
-                Items.Clear();
-                CargoWeightCheck(); // Ensure weight check after unloading
-                Console.WriteLine($"Items successfully unloaded at {destination}.");
+                Items.Clear(); // Clear items after unloading
             }
             else
             {
-                Console.WriteLine($"Failed to unload items at {destination}.");
+                Console.WriteLine($"Failed to unload items to {destination}.");
             }
-        }
-        public void CalculateWeightCargo(List<IPortable> items)
-        {
-            foreach (var item in items)
-            {
-                CurrentItemsWeightInCargo += item.Weight;
-            }
-        }
-
-        public void ClearWeightCargo()
-        {
-            CurrentItemsWeightInCargo = 0;
+            CargoWeightCheck(); // Ensure weight check after unloading
+            Console.WriteLine("All items successfully unloaded at " + destination);
         }
 
         public void CargoWeightCheck()
         {
-            double totalWeight = 0;
-            foreach (var item in Items)
-            {
-                totalWeight += item.Weight;
-            }
+            double totalWeight = Items.Sum(c => c.Weight);
             IsOverWeight = totalWeight > MaxWeight;
             CanDrive = !IsOverWeight;
         }
 
         public double ToPayed()
         {
-            double totalWeight = 0;
-            double volume = 0;
-            foreach (var item in Items)
-            {
-                totalWeight += item.Weight;
-                volume += item.Volume;
-            }
+            double totalWeight = Items.Sum(c => c.Weight);
+            double volume = Items.Sum(c => c.Volume);
             int distance = 2000; // 2000 km
-            return 1.2 * (distance * totalWeight * volume);
+
+            double cost = 0.0;
+
+            switch (Driver.VehicleType)
+            {
+                case DriverType.CargoCar:
+                    cost = distance * volume * totalWeight;
+                    break;
+                case DriverType.FreightTrain:
+                    cost = 5 * distance * volume * totalWeight;
+                    break;
+                case DriverType.CargoShip:
+                    cost = 20 * distance * volume * totalWeight;
+                    break;
+                case DriverType.FreightPlane:
+                    cost = 50 * distance * volume * totalWeight;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Unsupported vehicle type");
+            }
+            return cost;
         }
 
         protected virtual bool CanLoad(IPortable item)
         {
-            double currentWeight = Items.Sum(i => i.Weight);
-            double currentVolume = Items.Sum(i => i.Volume);
+            double currentWeight = Items.Sum(c => c.Weight);
+            double currentVolume = Items.Sum(c => c.Volume);
 
             return (currentWeight + item.Weight <= MaxWeight) && (currentVolume + item.Volume <= MaxVolume);
         }
@@ -120,12 +121,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         public bool Unload(IPortable item)
         {
-            bool removed = Items.Remove(item);
-            if (removed)
+            if (Items.Remove(item))
             {
                 CargoWeightCheck(); // Recalculate weight and volume after unloading
+                return true;
             }
-            return removed;
+            return false;
         }
 
         public bool Unload(List<IPortable> items)
