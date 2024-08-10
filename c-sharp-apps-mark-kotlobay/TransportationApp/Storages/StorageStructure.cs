@@ -40,8 +40,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             // Check if there is enough capacity to load the items
             if (WeightStored + totalWeight <= CapacityWeight && VolumeStored + totalVolume <= CapacityVolume)
             {
-                WeightStored += totalWeight;
-                VolumeStored += totalVolume;
+                WeightStored += Math.Round(totalWeight);
+                VolumeStored += Math.Round(totalVolume);
                 return true; // Items loaded successfully
             }
             return false; // Not enough capacity to load items

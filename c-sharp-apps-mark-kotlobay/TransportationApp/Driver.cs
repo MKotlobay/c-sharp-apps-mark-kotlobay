@@ -78,12 +78,6 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 Destination = destination;
                 IsOnWay = true;
                 Console.WriteLine($"Driver {Name} {SureName} approved. Next destination: {Destination}");
-
-                // Start a timer to set IsOnWay to false after 1 minute + Updates location for destination
-                await Task.Delay(TimeSpan.FromMinutes(1));
-                IsOnWay = false;
-                Located = destination;
-                Console.WriteLine($"Driver {Name} {SureName} has arrived at {destination}");
             }
             else
             {
@@ -93,7 +87,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         public bool OnWay()
         {
-            if (IsOnWay)
+            if (Located != Destination)
             {
                 Console.WriteLine($"{Name} {SureName} is on the way to {Destination}");
                 return true;

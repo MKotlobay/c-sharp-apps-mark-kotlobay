@@ -12,7 +12,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
         protected int NumWarehouse { get; set; }
         protected double MaxCapacityWeight { get; set; }
         protected double MaxCapacityVolume { get; set; }
-        protected List<IPortable> InStorage { get; set; }
+        public List<IPortable> InStorage { get; set; }
         public Crane Crane { get; set; }
 
         public Warehouse(string country, string city, string street, int number, double maxCapacityWeight, double maxCapacityVolume, List<IPortable> items, string name, int numWarehouse)

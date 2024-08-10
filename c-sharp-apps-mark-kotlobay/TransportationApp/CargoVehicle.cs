@@ -36,20 +36,19 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             NextStorageStructure = null;
             CurrentDriveID = new Random().Next(1000, 10000);
             ExpectedToPayed = ToPayed();
+            WeightInCargo();
         }
 
-        public void UnloadItems(StorageStructure destination)
+        public void WeightInCargo()
         {
-            if (destination.Load(Items))
+            foreach (var item in Items)
             {
-                Items.Clear(); // Clear items after unloading
+                CurrentItemsWeightInCargo += item.Weight;
+                if (CurrentItemsWeightInCargo > MaxWeight)
+                {
+                    Console.WriteLine("Weight Issue !");
+                }
             }
-            else
-            {
-                Console.WriteLine($"Failed to unload items to {destination}.");
-            }
-            CargoWeightCheck(); // Ensure weight check after unloading
-            Console.WriteLine("All items successfully unloaded at " + destination);
         }
 
         public void CargoWeightCheck()

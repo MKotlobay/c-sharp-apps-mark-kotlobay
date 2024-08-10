@@ -13,5 +13,24 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             : base(driver, maxWeight, maxVolume, items, storageStructureParked, storageStructureToGo)
         {
         }
+
+        public bool LoadItemToStorage(IPortable item)
+        {
+            if (CurrentItemsWeightInCargo + item.Weight <= MaxWeight)
+            {
+                Items.Add(item);
+                CurrentItemsWeightInCargo += item.Weight;
+                return true;
+            }
+            return false;
+        }
+
+        public void LoadItemsToStorage(List<IPortable> newItems)
+        {
+            foreach (var item in newItems)
+            {
+                LoadItemToStorage(item);
+            }
+        }
     }
 }
