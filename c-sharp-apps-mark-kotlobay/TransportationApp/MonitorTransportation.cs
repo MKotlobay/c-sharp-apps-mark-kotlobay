@@ -73,15 +73,15 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             Drivers = new List<Driver>
             {
                 new Driver("John", "Doe", "123", DriverType.CargoCar, "Main Warehouse", new List<IPortable>()),
-                new Driver("Jane", "Smith", "456", DriverType.FreightTrain, "Secondary Warehouse", new List<IPortable>()),
-                new Driver("Jim", "Beam", "789", DriverType.FreightPlane, "Main Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Jane", "Smith", "456", DriverType.FreightTrain, "Secondary Warehouse", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Jim", "Beam", "789", DriverType.FreightPlane, "Main Port", new List<IPortable>()),
                 new Driver("Jack", "Daniels", "101", DriverType.CargoShip, "Secondary Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
                 new Driver("Johnny", "Walker", "102", DriverType.CargoCar, "Tertiary Port", new List<IPortable>()),
-                new Driver("James", "Bond", "103", DriverType.FreightTrain, "Main Warehouse", new List<IPortable>()),
-                new Driver("Tony", "Stark", "104", DriverType.FreightPlane, "Secondary Warehouse", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("James", "Bond", "103", DriverType.FreightTrain, "Main Warehouse", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
+                new Driver("Tony", "Stark", "104", DriverType.FreightPlane, "Secondary Warehouse", new List<IPortable>()),
                 new Driver("Steve", "Rogers", "105", DriverType.CargoShip, "Main Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>()))),
                 new Driver("Bruce", "Wayne", "106", DriverType.CargoCar, "Secondary Port", new List<IPortable>()),
-                new Driver("Clark", "Kent", "107", DriverType.FreightTrain, "Tertiary Port", new List<IPortable>())
+                new Driver("Clark", "Kent", "107", DriverType.FreightTrain, "Tertiary Port", new List<IPortable>(GenerateRandomItems(new List<IPortable>())))
             };
 
             Warehouses = new List<Warehouse>
@@ -182,6 +182,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         private void LoadItemsInPorts()
         {
+            bool atLeastOnePortLoaded = false;
+
             foreach (var port in Ports)
             {
                 foreach (var driver in Drivers)
@@ -192,73 +194,84 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                         {
                             case CargoShip cargoShip:
                                 if (port.Crane.Load(cargoShip.Containers))
+                                {
                                     port.UnpackItemsFromContainers(cargoShip.Containers);
+                                    atLeastOnePortLoaded = true;
+                                }
                                 cargoShip.Containers.Clear();
                                 cargoShip.CurrentItemsWeightInCargo = 0;
                                 break;
                             case FreightTrain freightTrain:
                                 if (port.Crane.Load(freightTrain.Containers))
+                                {
                                     port.UnpackItemsFromContainers(freightTrain.Containers);
+                                    atLeastOnePortLoaded = true;
+                                }
                                 freightTrain.Containers.Clear();
                                 freightTrain.CurrentItemsWeightInCargo = 0;
                                 break;
                             case FreightPlane freightPlane:
                                 port.Load(freightPlane.Items);
+                                atLeastOnePortLoaded = true;
                                 freightPlane.Items.Clear();
                                 break;
                             case CargoCar cargoCar:
                                 port.Load(cargoCar.Items);
+                                atLeastOnePortLoaded = true;
                                 cargoCar.Items.Clear();
                                 break;
                         }
                     }
                 }
             }
-        }
 
+            if (!atLeastOnePortLoaded)
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("No available port could load the items.");
+            }
+        }
 
         private void LoadItemsInWarehouses()
         {
             bool atLeastOneWarehouseLoaded = false;
 
-            foreach (var driver in Drivers)
+            foreach (var warehouse in Warehouses)
             {
-                if (driver.Located == "Main Warehouse" || driver.Located == "Secondary Warehouse" || driver.Located == "Tertiary Warehouse")
+                foreach (var driver in Drivers)
                 {
-                    foreach (var warehouse in Warehouses)
+                    if (driver.Located == warehouse.Name)
                     {
-                        if (driver.Located == warehouse.Name)
+                        switch (driver.CargoVehicle)
                         {
-                            switch (driver.CargoVehicle)
-                            {
-                                case CargoShip cargoShip:
-                                    List<IPortable> itemsFromContainers = cargoShip.ContainersToItemsList();
-                                    cargoShip.Containers = new List<Container>();
-                                    warehouse.Load(itemsFromContainers);
-                                    break;
-                                case FreightTrain freightTrain:
-                                    itemsFromContainers = freightTrain.ContainersToItemsList();
-                                    freightTrain.Containers = new List<Container>();
-                                    warehouse.Load(itemsFromContainers);
-                                    break;
-                                case FreightPlane freightPlane:
-                                    warehouse.Load(freightPlane.Items);
-                                    freightPlane.Items = new List<IPortable>();
-                                    freightPlane.CurrentItemsWeightInCargo = 0;
-                                    break;
-                                case CargoCar cargoCar:
-                                    warehouse.Load(cargoCar.Items);
-                                    cargoCar.Items = new List<IPortable>();
-                                    cargoCar.CurrentItemsWeightInCargo = 0;
-                                    break;
-                            }
-
-                            atLeastOneWarehouseLoaded = true; // Load items into the warehouse
-
-                            driver.CargoVehicle.Items.Clear(); // Clear items after loading
-
-                            Console.WriteLine("----------");
-                            Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {warehouse.Name}");
+                            case CargoShip cargoShip:
+                                if (warehouse.Crane.Load(cargoShip.Containers))
+                                {
+                                    warehouse.UnpackItemsFromContainers(cargoShip.Containers);
+                                    atLeastOneWarehouseLoaded = true;
+                                }
+                                cargoShip.Containers.Clear();
+                                cargoShip.CurrentItemsWeightInCargo = 0;
+                                break;
+                            case FreightTrain freightTrain:
+                                if (warehouse.Crane.Load(freightTrain.Containers))
+                                {
+                                    warehouse.UnpackItemsFromContainers(freightTrain.Containers);
+                                    atLeastOneWarehouseLoaded = true;
+                                }
+                                freightTrain.Containers.Clear();
+                                freightTrain.CurrentItemsWeightInCargo = 0;
+                                break;
+                            case FreightPlane freightPlane:
+                                warehouse.Load(freightPlane.Items);
+                                atLeastOneWarehouseLoaded = true;
+                                freightPlane.Items.Clear();
+                                break;
+                            case CargoCar cargoCar:
+                                warehouse.Load(cargoCar.Items);
+                                atLeastOneWarehouseLoaded = true;
+                                cargoCar.Items.Clear();
+                                break;
                         }
                     }
                 }

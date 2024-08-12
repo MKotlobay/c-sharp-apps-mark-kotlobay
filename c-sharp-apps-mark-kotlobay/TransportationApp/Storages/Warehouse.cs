@@ -13,6 +13,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
         protected double MaxCapacityWeight { get; set; }
         protected double MaxCapacityVolume { get; set; }
         public Crane Crane { get; set; }
+        public List<Container> Containers { get; set; }
 
         public Warehouse(string country, string city, string street, int number, double maxCapacityWeight, double maxCapacityVolume, string name, int numWarehouse)
             : base(country, city, street, number, maxCapacityWeight, maxCapacityVolume)
@@ -22,46 +23,74 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             MaxCapacityWeight = maxCapacityWeight;
             MaxCapacityVolume = maxCapacityVolume;
             Crane = new Crane(maxCapacityWeight, maxCapacityVolume);
+            Containers = new List<Container>();
         }
-
-        public void LoadItems(List<IPortable> itemsFromCargo)
+        public List<Container> LoadItemsToContainers()
         {
-            foreach (var item in itemsFromCargo.ToList())
+            List<Container> containers = new List<Container>();
+
+            foreach (var item in Items.ToList())
             {
-                if (item is Container container)
+                bool itemAdded = false;
+
+                foreach (var container in containers)
                 {
-                    if (Crane.Load(container))
+                    if (container.Volume + item.Volume <= container.MaxVolume)
                     {
-                        if (WeightStored + container.Weight <= MaxCapacityWeight && VolumeStored + container.Volume <= MaxCapacityVolume)
-                        {
-                            WeightStored += container.Weight;
-                            VolumeStored += container.Volume;
-                            Items.Add(container);
-                            itemsFromCargo.Remove(item);
-                        }
-                        else
-                        {
-                            Crane.Unload(container);
-                            Console.WriteLine($"Cannot store more items. Current weight: {WeightStored}, volume: {VolumeStored}, max weight: {MaxCapacityWeight}, max volume: {MaxCapacityVolume}");
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Cannot load container. The container type is not suitable for this warehouse.");
+                        container.AddItem(item);
+                        UpdateStorage(item.Weight, item.Volume);
+                        itemAdded = true;
+                        break;
                     }
                 }
+
+                if (!itemAdded)
+                {
+                    Container newContainer = new Container();
+                    newContainer.AddItem(item);
+                    UpdateStorage(item.Weight, item.Volume);
+                    containers.Add(newContainer);
+                }
             }
+            return containers;
         }
+
+        public void UnpackItemsFromContainers(List<Container> containers)
+        {
+            foreach (var container in containers)
+            {
+                double totalWeight = container.Items.Sum(item => item.Weight);
+                double totalVolume = container.Items.Sum(item => item.Volume);
+
+                // Directly add the items from the container to the port's Items list
+                Items.AddRange(container.Items);
+
+                // Update CurrentItemsWeightInCargo (assuming you have access to this property)
+                WeightStored += totalWeight;
+                VolumeStored += totalVolume;
+
+                // Update storage
+                UpdateStorage(totalWeight, totalVolume);
+
+                // Clear the items in the container after unpacking
+                container.ClearItems();
+            }
+            WeightStored = Math.Round(WeightStored);
+            VolumeStored = Math.Round(VolumeStored);
+
+            Console.WriteLine("Items have been unpacked from containers to the port.");
+        }
+
+
         public void UpdateStorage(double weight, double volume)
         {
-            WeightStored -= weight;
-            VolumeStored -= volume;
+            WeightStored += weight;
+            VolumeStored += volume;
         }
 
         public override string ToString()
         {
-            return $"Warehouse Name: {Name}\n" +
+            return $"Port Name: {Name}\n" +
                    $"Location: {Country}, {City}, {Street}, {Number}\n" +
                    $"Capacity: {MaxCapacityWeight}kg, {MaxCapacityVolume}m³\n" +
                    $"Stored Weight: {WeightStored}kg, Stored Volume: {VolumeStored}m³\n";

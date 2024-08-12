@@ -16,7 +16,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
         {
             CreateContainerList(items);
             Items.Clear();
-            CurrentItemsWeightInCargo = 0;
+            CurrentItemsWeightInCargo = Containers.Sum(c => c.Items.Sum(i => i.Weight));
         }
 
         public void CreateContainerList(IPortable item)
@@ -59,6 +59,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
                 items.AddRange(container.Items);
             }
             Containers.Clear();
+            CurrentItemsWeightInCargo = 0; // Reset weight after clearing containers
+            Console.WriteLine("All containers cleared. Current weight in cargo reset.");
             return items;
         }
     }

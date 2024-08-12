@@ -60,20 +60,33 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
         {
             foreach (var container in containers)
             {
+                double totalWeight = container.Items.Sum(item => item.Weight);
+                double totalVolume = container.Items.Sum(item => item.Volume);
+
                 // Directly add the items from the container to the port's Items list
                 Items.AddRange(container.Items);
+
+                // Update CurrentItemsWeightInCargo (assuming you have access to this property)
+                WeightStored += totalWeight;
+                VolumeStored += totalVolume;
+
+                // Update storage
+                UpdateStorage(totalWeight, totalVolume);
 
                 // Clear the items in the container after unpacking
                 container.ClearItems();
             }
+            WeightStored = Math.Round(WeightStored);
+            VolumeStored = Math.Round(VolumeStored);
 
             Console.WriteLine("Items have been unpacked from containers to the port.");
         }
 
+
         public void UpdateStorage(double weight, double volume)
         {
-            WeightStored -= weight;
-            VolumeStored -= volume;
+            WeightStored += weight;
+            VolumeStored += volume;
         }
 
         public override string ToString()

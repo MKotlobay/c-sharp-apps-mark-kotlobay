@@ -17,7 +17,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
         {
             CreateContainerList(items);
             Items.Clear();
-            CurrentItemsWeightInCargo = 0;
+            CurrentItemsWeightInCargo = Containers.Sum(c => c.Items.Sum(i => i.Weight));
         }
 
         public void CreateContainerList(IPortable item)
@@ -31,26 +31,24 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
                     container.AddItem(item);
                     itemAdded = true;
                     CurrentItemsWeightInCargo += item.Weight;
-                    break; // Exit the loop as the item has been added
+                    break;
                 }
             }
 
             if (!itemAdded)
             {
-                // Create a new container and add the item to this new container
-                var newContainer = new Container(); // Assuming a default constructor
+                var newContainer = new Container();
                 newContainer.AddItem(item);
                 Containers.Add(newContainer);
                 CurrentItemsWeightInCargo += item.Weight;
             }
         }
 
-        // Method to create containers for a list of items
         public void CreateContainerList(List<IPortable> items)
         {
             foreach (var item in items)
             {
-                CreateContainerList(item); // Reuse the single item method
+                CreateContainerList(item);
             }
         }
 
@@ -61,6 +59,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             {
                 items.AddRange(container.Items);
             }
+            Containers.Clear();
+            CurrentItemsWeightInCargo = 0; // Reset weight after clearing containers
+            Console.WriteLine("All containers cleared. Current weight in cargo reset.");
             return items;
         }
     }

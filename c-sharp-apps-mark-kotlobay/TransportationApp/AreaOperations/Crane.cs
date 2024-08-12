@@ -20,11 +20,11 @@ public class Crane : IContainable
 
     public bool Load(IPortable item)
     {
-        if (item is Container container)
-        {
-            return LoadContainer(container);
-        }
-        Console.WriteLine("Item is not a valid container.");
+        return false;
+    }
+
+    public bool Load(List<IPortable> items)
+    {
         return false;
     }
 
@@ -33,23 +33,11 @@ public class Crane : IContainable
         return LoadContainer(container);
     }
 
-    public bool Load(List<IPortable> items)
-    {
-        foreach (var item in items)
-        {
-            if (!Load(item))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public bool Load(List<Container> containers)
     {
         foreach (var container in containers)
         {
-            if (!LoadContainer(container))
+            if (LoadContainer(container) == false)
             {
                 return false;
             }
@@ -98,39 +86,21 @@ public class Crane : IContainable
 
     private bool LoadContainer(Container container)
     {
-        CurrentWeight = container.Weight;
-        if (CurrentWeight <= MaxCapacityWeight)
-        {
-            CurrentWeight += container.Weight;
-            CurrentVolume += container.Volume;
+        if (container.Weight <= MaxCapacityWeight)
             return true;
-        }
-        else
-        {
-            Console.WriteLine("Cannot load container. Exceeds crane capacity.");
-            return false;
-        }
+        return false;
     }
 
     private bool UnloadContainer(Container container)
     {
-        if (CurrentWeight - container.Weight >= 0 &&
-            CurrentVolume - container.Volume >= 0)
-        {
-            CurrentWeight -= container.Weight;
-            CurrentVolume -= container.Volume;
+        if (container.Weight <= MaxCapacityWeight)
             return true;
-        }
-        else
-        {
-            Console.WriteLine("Cannot unload container. Exceeds crane capacity.");
-            return false;
-        }
+        return false;
     }
 
     public bool IsReadyToTravel()
     {
-        return CurrentWeight > 0 && CurrentVolume > 0 && IsCraneOperational();
+        return true;
     }
 
     private bool IsCraneOperational()
