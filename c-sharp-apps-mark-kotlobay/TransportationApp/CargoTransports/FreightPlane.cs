@@ -9,9 +9,28 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 {
     public class FreightPlane : CargoVehicle
     {
-        public FreightPlane(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
+        public FreightPlane(Driver driver, double maxWeight, double maxVolume, List<IContainable> items, string storageStructureParked, string storageStructureToGo)
             : base(driver, maxWeight, maxVolume, items, storageStructureParked, storageStructureToGo)
         {
+        }
+
+        public bool LoadItemToStorage(IContainable item)
+        {
+            if (CurrentItemsWeightInCargo + item.Weight <= MaxWeight)
+            {
+                Items.Add(item);
+                CurrentItemsWeightInCargo += item.Weight;
+                return true;
+            }
+            return false;
+        }
+
+        public void LoadItemsToStorage(List<IContainable> newItems)
+        {
+            foreach (var item in newItems)
+            {
+                LoadItemToStorage(item);
+            }
         }
     }
 }

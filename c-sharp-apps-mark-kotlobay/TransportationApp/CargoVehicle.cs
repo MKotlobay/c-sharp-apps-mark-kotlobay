@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
+using c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
+using c_sharp_apps_mark_kotlobay.TransportationApp.Storages;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp
 {
-    public abstract class CargoVehicle : IContainable
+    public abstract class CargoVehicle : IPortable
     {
         protected Driver Driver { get; set; }
         protected double MaxWeight { get; set; }
@@ -15,14 +18,16 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected bool CanDrive { get; set; }
         protected bool IsOverWeight { get; set; }
         protected string? NextStorageStructure { get; set; }
-        public List<IPortable> Items { get; set; }
+        public List<IContainable> Items { get; set; }
+
+        public List<Container> Containers = new List<Container>();
         protected double ExpectedToPayed { get; set; }
         protected string StorageStructureParked { get; set; }
         protected string StorageStructureToGo { get; set; }
-        protected int CurrentDriveID { get; private set; }
+        public int CurrentDriveID { get; private set; }
         public double CurrentItemsWeightInCargo { get; set; }
 
-        protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
+        protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IContainable> items, string storageStructureParked, string storageStructureToGo)
         {
             Driver = driver;
             MaxWeight = maxWeight;
@@ -34,108 +39,175 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             NextStorageStructure = null;
             CurrentDriveID = new Random().Next(1000, 10000);
             ExpectedToPayed = ToPayed();
-            CalculateWeightCargo(items);
+            WeightInCargo();
         }
-        public void UnloadItems(StorageStructure destination)
+
+        public void WeightInCargo()
         {
-            if (destination.Load(Items))
-            {
-                Items.Clear();
-                CargoWeightCheck(); // Ensure weight check after unloading
-                Console.WriteLine($"Items successfully unloaded at {destination}.");
-            }
-            else
-            {
-                Console.WriteLine($"Failed to unload items at {destination}.");
-            }
-        }
-        public void CalculateWeightCargo(List<IPortable> items)
-        {
-            foreach (var item in items)
+            foreach (var item in Items)
             {
                 CurrentItemsWeightInCargo += item.Weight;
+                if (CurrentItemsWeightInCargo > MaxWeight)
+                {
+                    Console.WriteLine("Weight Issue !");
+                }
             }
         }
 
-        public void ClearWeightCargo()
+        public double WeightInCargoContainers()
         {
-            CurrentItemsWeightInCargo = 0;
+            foreach (var container in Containers)
+            {
+                foreach (var item in container.Items)
+                {
+                    CurrentItemsWeightInCargo += item.Weight;
+                }
+            }
+            return CurrentItemsWeightInCargo;
+        }
+
+        public double VolumeInCargoContainers()
+        {
+            double tempVolume = 0;
+            foreach (var container in Containers)
+            {
+                foreach (var item in container.Items)
+                {
+                    tempVolume += item.Volume;
+                }
+            }
+            return tempVolume;
         }
 
         public void CargoWeightCheck()
         {
-            double totalWeight = 0;
-            foreach (var item in Items)
-            {
-                totalWeight += item.Weight;
-            }
+            double totalWeight = Items.Sum(c => c.Weight);
             IsOverWeight = totalWeight > MaxWeight;
             CanDrive = !IsOverWeight;
         }
 
         public double ToPayed()
         {
-            double totalWeight = 0;
-            double volume = 0;
-            foreach (var item in Items)
-            {
-                totalWeight += item.Weight;
-                volume += item.Volume;
-            }
             int distance = 2000; // 2000 km
-            return 1.2 * (distance * totalWeight * volume);
+            double cost = 0.0;
+
+            switch (Driver.VehicleType)
+            {
+                case DriverType.CargoCar:
+                    cost = distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
+                    break;
+                case DriverType.FreightTrain:
+                    cost = 5 * distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
+                    break;
+                case DriverType.CargoShip:
+                    cost = 20 * distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
+                    break;
+                case DriverType.FreightPlane:
+                    cost = 50 * distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Unsupported vehicle type");
+            }
+            return cost;
         }
 
-        protected virtual bool CanLoad(IPortable item)
+        protected virtual bool CanLoad(IContainable item)
         {
-            double currentWeight = Items.Sum(i => i.Weight);
-            double currentVolume = Items.Sum(i => i.Volume);
+            double currentWeight = Items.Sum(c => c.Weight);
+            double currentVolume = Items.Sum(c => c.Volume);
 
             return (currentWeight + item.Weight <= MaxWeight) && (currentVolume + item.Volume <= MaxVolume);
         }
 
-        public bool Load(IPortable item)
+        public bool Load(IContainable item)
         {
             if (CanLoad(item))
             {
                 Items.Add(item);
-                CargoWeightCheck(); // Recalculate weight and volume after loading
+                CargoWeightCheck();
                 return true;
             }
             return false;
         }
 
-        public bool Load(List<IPortable> items)
+        public bool Load(List<IContainable> items)
         {
             bool allLoaded = true;
             foreach (var item in items)
             {
                 if (!Load(item))
                 {
-                    allLoaded = false; // If any item cannot be loaded, return false
+                    allLoaded = false;
                 }
             }
             return allLoaded;
         }
 
-        public bool Unload(IPortable item)
+        public bool Unload(IContainable item)
         {
-            bool removed = Items.Remove(item);
-            if (removed)
+            if (Items.Remove(item))
             {
-                CargoWeightCheck(); // Recalculate weight and volume after unloading
+                CargoWeightCheck();
+                return true;
             }
-            return removed;
+            return false;
         }
 
-        public bool Unload(List<IPortable> items)
+        public bool Unload(List<IContainable> items)
         {
             bool allRemoved = true;
             foreach (var item in items)
             {
                 if (!Unload(item))
                 {
-                    allRemoved = false; // If any item cannot be unloaded, return false
+                    allRemoved = false;
+                }
+            }
+            return allRemoved;
+        }
+
+        public bool Load(Container container)
+        {
+            if (CanLoad(container))
+            {
+                Containers.Add(container);
+                CargoWeightCheck();
+                return true;
+            }
+            return false;
+        }
+
+        public bool Load(List<Container> containers)
+        {
+            bool allLoaded = true;
+            foreach (var container in containers)
+            {
+                if (!Load(container))
+                {
+                    allLoaded = false;
+                }
+            }
+            return allLoaded;
+        }
+
+        public bool Unload(Container container)
+        {
+            if (Containers.Remove(container))
+            {
+                CargoWeightCheck();
+                return true;
+            }
+            return false;
+        }
+
+        public bool Unload(List<Container> containers)
+        {
+            bool allRemoved = true;
+            foreach (var container in containers)
+            {
+                if (!Unload(container))
+                {
+                    allRemoved = false;
                 }
             }
             return allRemoved;
