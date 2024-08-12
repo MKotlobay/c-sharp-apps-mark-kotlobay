@@ -1,4 +1,5 @@
 ﻿using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
+using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
         protected int Number { get; set; }
         protected double CapacityWeight { get; set; }
         protected double CapacityVolume { get; set; }
-        protected double WeightStored { get; set; }
-        protected double VolumeStored { get; set; }
-        protected List<IPortable> Items { get; set; }
+        public double WeightStored { get; set; }
+        public double VolumeStored { get; set; }
+        public List<IPortable> Items { get; set; }
+        public List<Container> Containers { get; private set; }
 
-        protected StorageStructure(string country, string city, string street, int number, double capacityWeight, double capacityVolume, List<IPortable> items)
+        protected StorageStructure(string country, string city, string street, int number, double capacityWeight, double capacityVolume)
         {
             Country = country;
             City = city;
@@ -29,10 +31,27 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             CapacityVolume = capacityVolume;
             WeightStored = 0;
             VolumeStored = 0;
-            Items = items;
+            Items = new List<IPortable>();
+            Containers = new List<Container>();
         }
 
-        public bool Load(List<IPortable> items)
+        public virtual void Load(List<IPortable> items)
+        {
+            if (LoadCheck(items) == true)
+            {
+                Items.AddRange(items);
+            }
+        }
+
+        public void WeightUpdate()
+        {
+            foreach (var item in Items)
+            {
+                WeightStored += item.Weight;
+            }
+        }
+
+        public bool LoadCheck(List<IPortable> items)
         {
             double totalWeight = items.Sum(item => item.Weight);
             double totalVolume = items.Sum(item => item.Volume);
@@ -42,25 +61,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             {
                 WeightStored += Math.Round(totalWeight);
                 VolumeStored += Math.Round(totalVolume);
-                return true; // Items loaded successfully
+                return true; // Items can be loaded
             }
             return false; // Not enough capacity to load items
-        }
-
-        // Optional: Method to unload items from the storage structure
-        public bool Unload(List<IPortable> items)
-        {
-            double totalWeight = items.Sum(item => item.Weight);
-            double totalVolume = items.Sum(item => item.Volume);
-
-            // Check if the items are already in the storage
-            if (WeightStored - totalWeight >= 0 && VolumeStored - totalVolume >= 0)
-            {
-                WeightStored -= totalWeight;
-                VolumeStored -= totalVolume;
-                return true; // Items unloaded successfully
-            }
-            return false; // Items not found or other issue
         }
     }
 

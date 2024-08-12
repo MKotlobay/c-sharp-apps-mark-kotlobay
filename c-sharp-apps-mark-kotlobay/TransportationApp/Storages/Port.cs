@@ -12,48 +12,68 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
         protected int NumWarehouse { get; set; }
         protected double MaxCapacityWeight { get; set; }
         protected double MaxCapacityVolume { get; set; }
-        public List<IPortable> InStorage { get; set; }
         public Crane Crane { get; set; }
+        public List<Container> Containers { get; set; }
 
-        public Port(string country, string city, string street, int number, double maxCapacityWeight, List<IPortable> items, double maxCapacityVolume, string name, int numWarehouse)
-            : base(country, city, street, number, maxCapacityWeight, maxCapacityVolume, items)
+        public Port(string country, string city, string street, int number, double maxCapacityWeight, double maxCapacityVolume, string name, int numWarehouse)
+            : base(country, city, street, number, maxCapacityWeight, maxCapacityVolume)
         {
             Name = name;
             NumWarehouse = numWarehouse;
             MaxCapacityWeight = maxCapacityWeight;
             MaxCapacityVolume = maxCapacityVolume;
-            InStorage = new List<IPortable>();
             Crane = new Crane(maxCapacityWeight, maxCapacityVolume);
+            Containers = new List<Container>();
         }
 
-        public void LoadItems(List<IPortable> itemsFromCargo)
+        public List<Container> LoadItemsToContainers()
         {
-            foreach (var item in itemsFromCargo.ToList())
+            List<Container> containers = new List<Container>();
+
+            foreach (var item in Items.ToList())
             {
-                if (item is Container container)
+                bool itemAdded = false;
+
+                foreach (var container in containers)
                 {
-                    if (Crane.Load(container))
+                    if (container.Volume + item.Volume <= container.MaxVolume)
                     {
-                        if (WeightStored + container.Weight < MaxCapacityWeight && VolumeStored + container.Volume < MaxCapacityVolume)
-                        {
-                            WeightStored += container.Weight;
-                            VolumeStored += container.Volume;
-                            InStorage.Add(container);
-                            itemsFromCargo.Remove(item);
-                        }
-                        else
-                        {
-                            Crane.Unload(container);
-                            Console.WriteLine($"Cannot store more items. Current weight: {WeightStored}, volume: {VolumeStored}, max weight: {MaxCapacityWeight}, max volume: {MaxCapacityVolume}");
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Cannot load container. The container type is not suitable for this port.");
+                        container.AddItem(item);
+                        UpdateStorage(item.Weight, item.Volume);
+                        itemAdded = true;
+                        break;
                     }
                 }
+
+                if (!itemAdded)
+                {
+                    Container newContainer = new Container();
+                    newContainer.AddItem(item);
+                    UpdateStorage(item.Weight, item.Volume);
+                    containers.Add(newContainer);
+                }
             }
+            return containers;
+        }
+
+        public void UnpackItemsFromContainers(List<Container> containers)
+        {
+            foreach (var container in containers)
+            {
+                // Directly add the items from the container to the port's Items list
+                Items.AddRange(container.Items);
+
+                // Clear the items in the container after unpacking
+                container.ClearItems();
+            }
+
+            Console.WriteLine("Items have been unpacked from containers to the port.");
+        }
+
+        public void UpdateStorage(double weight, double volume)
+        {
+            WeightStored -= weight;
+            VolumeStored -= volume;
         }
 
         public override string ToString()

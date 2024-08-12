@@ -18,10 +18,12 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected bool IsOverWeight { get; set; }
         protected string? NextStorageStructure { get; set; }
         public List<IPortable> Items { get; set; }
+
+        public List<Container> Containers = new List<Container>();
         protected double ExpectedToPayed { get; set; }
         protected string StorageStructureParked { get; set; }
         protected string StorageStructureToGo { get; set; }
-        protected int CurrentDriveID { get; private set; }
+        public int CurrentDriveID { get; private set; }
         public double CurrentItemsWeightInCargo { get; set; }
 
         protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
@@ -51,6 +53,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             }
         }
 
+
         public void CargoWeightCheck()
         {
             double totalWeight = Items.Sum(c => c.Weight);
@@ -63,7 +66,6 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             double totalWeight = Items.Sum(c => c.Weight);
             double volume = Items.Sum(c => c.Volume);
             int distance = 2000; // 2000 km
-
             double cost = 0.0;
 
             switch (Driver.VehicleType)
@@ -99,7 +101,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             if (CanLoad(item))
             {
                 Items.Add(item);
-                CargoWeightCheck(); // Recalculate weight and volume after loading
+                CargoWeightCheck();
                 return true;
             }
             return false;
@@ -112,7 +114,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             {
                 if (!Load(item))
                 {
-                    allLoaded = false; // If any item cannot be loaded, return false
+                    allLoaded = false;
                 }
             }
             return allLoaded;
@@ -122,7 +124,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         {
             if (Items.Remove(item))
             {
-                CargoWeightCheck(); // Recalculate weight and volume after unloading
+                CargoWeightCheck();
                 return true;
             }
             return false;
@@ -135,7 +137,54 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             {
                 if (!Unload(item))
                 {
-                    allRemoved = false; // If any item cannot be unloaded, return false
+                    allRemoved = false;
+                }
+            }
+            return allRemoved;
+        }
+
+        public bool Load(Container container)
+        {
+            if (CanLoad(container))
+            {
+                Containers.Add(container);
+                CargoWeightCheck();
+                return true;
+            }
+            return false;
+        }
+
+        public bool Load(List<Container> containers)
+        {
+            bool allLoaded = true;
+            foreach (var container in containers)
+            {
+                if (!Load(container))
+                {
+                    allLoaded = false;
+                }
+            }
+            return allLoaded;
+        }
+
+        public bool Unload(Container container)
+        {
+            if (Containers.Remove(container))
+            {
+                CargoWeightCheck();
+                return true;
+            }
+            return false;
+        }
+
+        public bool Unload(List<Container> containers)
+        {
+            bool allRemoved = true;
+            foreach (var container in containers)
+            {
+                if (!Unload(container))
+                {
+                    allRemoved = false;
                 }
             }
             return allRemoved;

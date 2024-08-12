@@ -11,7 +11,6 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 {
     public class FreightTrain : CargoVehicle
     {
-        public List<Container> Containers = new List<Container>();
 
         public FreightTrain(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
             : base(driver, maxWeight, maxVolume, items, storageStructureParked, storageStructureToGo)
@@ -27,8 +26,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
 
             foreach (var container in Containers)
             {
-                if (container.CanAddItem(item) &&
-                    CurrentItemsWeightInCargo + item.Weight <= MaxWeight)
+                if (container.CanAddItem(item) && CurrentItemsWeightInCargo + item.Weight <= MaxWeight)
                 {
                     container.AddItem(item);
                     itemAdded = true;

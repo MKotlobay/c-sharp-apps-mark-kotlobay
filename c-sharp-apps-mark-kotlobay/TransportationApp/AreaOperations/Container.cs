@@ -31,15 +31,29 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
             Items = new List<IPortable>();
             Weight = 0;
         }
+
         public bool CanAddItem(IPortable item)
         {
             return (Weight + item.Weight <= 30000) && (Volume + item.Volume < MaxVolume);
         }
 
+        public void PriceConatiningItems()
+        {
+            foreach (var item in Items)
+            {
+                Price = item.Price;
+            }
+            Console.WriteLine($"Container with containing items price of it is {Price}");
+        }
+
         public void AddItem(IPortable item)
         {
-            Items.Add(item);
-            Weight += item.Weight;
+            if (CanAddItem(item))
+            {
+                Items.Add(item);
+                Volume += item.Volume;
+                Weight += item.Weight;
+            }
         }
 
         public void CalculateWeight()

@@ -1,55 +1,56 @@
-﻿using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
+﻿using System;
+using System.Collections.Generic;
+using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 
 public class Crane : IContainable
 {
-    public double MaxCapacityWeight { get; private set; } // Maximum weight crane can handle
-    public double MaxCapacityVolume { get; private set; } // Maximum volume crane can handle
-    public double CurrentWeight { get; private set; } // Current weight being carried by crane
-    public double CurrentVolume { get; private set; } // Current volume being carried by crane
-    public List<Container> Containers { get; private set; }
+    public double MaxCapacityWeight { get; private set; }
+    public double MaxCapacityVolume { get; private set; }
+    public double CurrentWeight { get; private set; }
+    public double CurrentVolume { get; private set; }
 
     public Crane(double maxCapacityWeight, double maxCapacityVolume)
     {
-        MaxCapacityWeight = maxCapacityWeight;
-        MaxCapacityVolume = maxCapacityVolume;
-        CurrentWeight = 0;
-        CurrentVolume = 0;
-        Containers = new List<Container>();
+        MaxCapacityWeight = maxCapacityWeight; // Max Weight can lift in once
+        MaxCapacityVolume = maxCapacityVolume; // Max Volume can lift in once
+        CurrentWeight = 0; // Current weight for container
+        CurrentVolume = 0; // Current volume for container
     }
 
     public bool Load(IPortable item)
     {
         if (item is Container container)
         {
-            if (CurrentWeight + container.Weight <= MaxCapacityWeight &&
-                CurrentVolume + container.Volume <= MaxCapacityVolume)
-            {
-                Containers.Add(container);
-                CurrentWeight += container.Weight;
-                CurrentVolume += container.Volume;
-                return true;
-            }
-            Console.WriteLine($"Cannot load container. Exceeds crane capacity. Current weight: {CurrentWeight}, volume: {CurrentVolume}, max weight: {MaxCapacityWeight}, max volume: {MaxCapacityVolume}");
+            return LoadContainer(container);
         }
+        Console.WriteLine("Item is not a valid container.");
         return false;
+    }
+
+    public bool Load(Container container)
+    {
+        return LoadContainer(container);
     }
 
     public bool Load(List<IPortable> items)
     {
         foreach (var item in items)
         {
-            if (item is Container container)
+            if (!Load(item))
             {
-                if (!Load(container)) // Use the single item Load method
-                {
-                    // If loading fails, stop the process and return false
-                    return false;
-                }
+                return false;
             }
-            else
+        }
+        return true;
+    }
+
+    public bool Load(List<Container> containers)
+    {
+        foreach (var container in containers)
+        {
+            if (!LoadContainer(container))
             {
-                Console.WriteLine($"Item {item} is not a valid container.");
                 return false;
             }
         }
@@ -58,14 +59,17 @@ public class Crane : IContainable
 
     public bool Unload(IPortable item)
     {
-        if (item is Container container && Containers.Contains(container))
+        if (item is Container container)
         {
-            Containers.Remove(container);
-            CurrentWeight -= container.Weight;
-            CurrentVolume -= container.Volume;
-            return true;
+            return UnloadContainer(container);
         }
+        Console.WriteLine("Item is not a valid container.");
         return false;
+    }
+
+    public bool Unload(Container container)
+    {
+        return UnloadContainer(container);
     }
 
     public bool Unload(List<IPortable> items)
@@ -80,9 +84,53 @@ public class Crane : IContainable
         return true;
     }
 
+    public bool Unload(List<Container> containers)
+    {
+        foreach (var container in containers)
+        {
+            if (!UnloadContainer(container))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private bool LoadContainer(Container container)
+    {
+        CurrentWeight = container.Weight;
+        if (CurrentWeight <= MaxCapacityWeight)
+        {
+            CurrentWeight += container.Weight;
+            CurrentVolume += container.Volume;
+            return true;
+        }
+        else
+        {
+            Console.WriteLine("Cannot load container. Exceeds crane capacity.");
+            return false;
+        }
+    }
+
+    private bool UnloadContainer(Container container)
+    {
+        if (CurrentWeight - container.Weight >= 0 &&
+            CurrentVolume - container.Volume >= 0)
+        {
+            CurrentWeight -= container.Weight;
+            CurrentVolume -= container.Volume;
+            return true;
+        }
+        else
+        {
+            Console.WriteLine("Cannot unload container. Exceeds crane capacity.");
+            return false;
+        }
+    }
+
     public bool IsReadyToTravel()
     {
-        return Containers.Count > 0 && IsCraneOperational();
+        return CurrentWeight > 0 && CurrentVolume > 0 && IsCraneOperational();
     }
 
     private bool IsCraneOperational()

@@ -12,17 +12,15 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
         protected int NumWarehouse { get; set; }
         protected double MaxCapacityWeight { get; set; }
         protected double MaxCapacityVolume { get; set; }
-        public List<IPortable> InStorage { get; set; }
         public Crane Crane { get; set; }
 
-        public Warehouse(string country, string city, string street, int number, double maxCapacityWeight, double maxCapacityVolume, List<IPortable> items, string name, int numWarehouse)
-            : base(country, city, street, number, maxCapacityWeight, maxCapacityVolume, items)
+        public Warehouse(string country, string city, string street, int number, double maxCapacityWeight, double maxCapacityVolume, string name, int numWarehouse)
+            : base(country, city, street, number, maxCapacityWeight, maxCapacityVolume)
         {
             Name = name;
             NumWarehouse = numWarehouse;
             MaxCapacityWeight = maxCapacityWeight;
             MaxCapacityVolume = maxCapacityVolume;
-            InStorage = new List<IPortable>();
             Crane = new Crane(maxCapacityWeight, maxCapacityVolume);
         }
 
@@ -38,7 +36,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
                         {
                             WeightStored += container.Weight;
                             VolumeStored += container.Volume;
-                            InStorage.Add(container);
+                            Items.Add(container);
                             itemsFromCargo.Remove(item);
                         }
                         else
@@ -54,6 +52,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
                     }
                 }
             }
+        }
+        public void UpdateStorage(double weight, double volume)
+        {
+            WeightStored -= weight;
+            VolumeStored -= volume;
         }
 
         public override string ToString()

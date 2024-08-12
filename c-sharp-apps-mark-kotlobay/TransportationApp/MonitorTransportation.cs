@@ -86,18 +86,16 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
             Warehouses = new List<Warehouse>
             {
-                new Warehouse("USA", "New York", "5th Avenue", 1, 100000, 50000, new List<IPortable>(GenerateRandomItems(new List<IPortable>())), "Main Warehouse", 101),
-                new Warehouse("USA", "Chicago", "Michigan Avenue", 2, 150000, 60000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), "Secondary Warehouse", 102)
+                new Warehouse("USA", "New York", "5th Avenue", 1, 100000, 50000, "Main Warehouse", 101),
+                new Warehouse("USA", "Chicago", "Michigan Avenue", 2, 150000, 60000, "Secondary Warehouse", 102)
             };
 
             Ports = new List<Port>
             {
-                new Port("USA", "Los Angeles", "Port Street", 1, 200000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 100000, "Main Port", 201),
-                new Port("USA", "San Francisco", "Bay Street", 2, 180000,new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 90000, "Secondary Port", 202),
-                new Port("USA", "Houston", "Harbor Street", 3, 220000, new List<IPortable>(GenerateRandomItems(new List<IPortable>())), 110000, "Tertiary Port", 203)
+                new Port("USA", "Los Angeles", "Port Street", 1, 200000, 100000, "Main Port", 201),
+                new Port("USA", "San Francisco", "Bay Street", 2, 180000, 90000, "Secondary Port", 202),
+                new Port("USA", "Houston", "Harbor Street", 3, 220000, 110000, "Tertiary Port", 203)
             };
-
-            Items = GenerateRandomItems(Items);
         }
 
         private void ChooseDestinationForDriver()
@@ -184,57 +182,40 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         private void LoadItemsInPorts()
         {
-            bool atLeastOnePortLoaded = false;
-
-            foreach (var driver in Drivers)
+            foreach (var port in Ports)
             {
-                if (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port")
+                foreach (var driver in Drivers)
                 {
-                    foreach (var port in Ports)
+                    if (driver.Located == port.Name)
                     {
-                        if (driver.Located == port.Name)
+                        switch (driver.CargoVehicle)
                         {
-                            switch (driver.CargoVehicle)
-                            {
-                                case CargoShip cargoShip:
-                                    List<IPortable> itemsFromContainers = cargoShip.ContainersToItemsList();
-                                    cargoShip.Containers = new List<Container>();
-                                    port.Load(itemsFromContainers);
-                                    break;
-                                case FreightTrain freightTrain:
-                                    itemsFromContainers = freightTrain.ContainersToItemsList();
-                                    freightTrain.Containers = new List<Container>();
-                                    port.Load(itemsFromContainers);
-                                    break;
-                                case FreightPlane freightPlane:
-                                    port.Load(freightPlane.Items);
-                                    freightPlane.Items = new List<IPortable>();
-                                    freightPlane.CurrentItemsWeightInCargo = 0;
-                                    break;
-                                case CargoCar cargoCar:
-                                    port.Load(cargoCar.Items);
-                                    cargoCar.Items = new List<IPortable>();
-                                    cargoCar.CurrentItemsWeightInCargo = 0;
-                                    break;
-                            }
-
-                            atLeastOnePortLoaded = true; // Load items into the port
-
-                            driver.CargoVehicle.Items.Clear(); // Clear items after loading
-
-                            Console.WriteLine("----------");
-                            Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items into {port.Name}");
+                            case CargoShip cargoShip:
+                                if (port.Crane.Load(cargoShip.Containers))
+                                    port.UnpackItemsFromContainers(cargoShip.Containers);
+                                cargoShip.Containers.Clear();
+                                cargoShip.CurrentItemsWeightInCargo = 0;
+                                break;
+                            case FreightTrain freightTrain:
+                                if (port.Crane.Load(freightTrain.Containers))
+                                    port.UnpackItemsFromContainers(freightTrain.Containers);
+                                freightTrain.Containers.Clear();
+                                freightTrain.CurrentItemsWeightInCargo = 0;
+                                break;
+                            case FreightPlane freightPlane:
+                                port.Load(freightPlane.Items);
+                                freightPlane.Items.Clear();
+                                break;
+                            case CargoCar cargoCar:
+                                port.Load(cargoCar.Items);
+                                cargoCar.Items.Clear();
+                                break;
                         }
                     }
                 }
             }
-
-            if (!atLeastOnePortLoaded)
-            {
-                Console.WriteLine("----------");
-                Console.WriteLine("No available port could load the items.");
-            }
         }
+
 
         private void LoadItemsInWarehouses()
         {
@@ -292,68 +273,73 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         private void UnloadAllItemsFromPorts()
         {
-            bool atLeastOnePortUnLoaded = false;
+            bool atLeastOnePortUnloaded = false;
 
             foreach (var driver in Drivers)
             {
-                if (driver.Located == "Main Port" || driver.Located == "Secondary Port" || driver.Located == "Tertiary Port")
+                foreach (var port in Ports)
                 {
-                    foreach (var port in Ports)
+                    if (driver.Located == port.Name)
                     {
-                        if (driver.Located == port.Name)
+                        switch (driver.CargoVehicle)
                         {
-                            switch (driver.CargoVehicle)
-                            {
-                                case CargoShip cargoShip:
-                                    foreach (var item in port.InStorage.ToList()) // ToList() to avoid modification during iteration
-                                    {
-                                        cargoShip.CreateContainerList(item);
-                                        port.InStorage.Remove(item);
-                                    }
-                                    Console.WriteLine("----------");
-                                    Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their CargoShip.");
-                                    break;
+                            case CargoShip cargoShip:
+                                foreach (var item in port.Items.ToList()) // .ToList() to avoid modifying the collection during iteration
+                                {
+                                    cargoShip.CreateContainerList(item);
+                                    port.WeightStored -= item.Weight;
+                                    port.VolumeStored -= item.Volume;
+                                    port.Items.Remove(item);
+                                    Console.WriteLine($"Unloaded item with weight {item.Weight} and volume {item.Volume} from port {port.Name}");
+                                }
+                                atLeastOnePortUnloaded = true;
+                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their CargoShip.");
+                                break;
 
-                                case FreightTrain freightTrain:
-                                    foreach (var item in port.InStorage.ToList()) // ToList() to avoid modification during iteration
-                                    {
-                                        freightTrain.CreateContainerList(item);
-                                        port.InStorage.Remove(item);
-                                    }
-                                    Console.WriteLine("----------");
-                                    Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their FreightTrain.");
-                                    break;
+                            case FreightTrain freightTrain:
+                                foreach (var item in port.Items.ToList())
+                                {
+                                    freightTrain.CreateContainerList(item);
+                                    port.WeightStored -= item.Weight;
+                                    port.VolumeStored -= item.Volume;
+                                    port.Items.Remove(item);
+                                }
+                                atLeastOnePortUnloaded = true;
+                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their FreightTrain.");
+                                break;
 
-                                case CargoCar cargoCar:
-                                    foreach (var item in port.InStorage.ToList())
-                                    {
-                                        cargoCar.LoadItemToStorage(item);
-                                        port.InStorage.Remove(item);
-                                    }
-                                    Console.WriteLine("----------");
-                                    Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their CargoCar.");
-                                    break;
+                            case CargoCar cargoCar:
+                                foreach (var item in port.Items.ToList())
+                                {
+                                    cargoCar.LoadItemToStorage(item);
+                                    port.WeightStored -= item.Weight;
+                                    port.VolumeStored -= item.Volume;
+                                    port.Items.Remove(item);
+                                }
+                                atLeastOnePortUnloaded = true;
+                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items from {port.Name} into their CargoCar.");
+                                break;
 
-                                case FreightPlane freightPlane:
-                                    foreach (var item in port.InStorage.ToList())
-                                    {
-                                        freightPlane.LoadItemToStorage(item);
-                                        port.InStorage.Remove(item);
-                                    }
-                                    Console.WriteLine("----------");
-                                    Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their FreightPlane.");
-                                    break;
-                            }
-                            atLeastOnePortUnLoaded = true;
+                            case FreightPlane freightPlane:
+                                foreach (var item in port.Items.ToList())
+                                {
+                                    freightPlane.LoadItemToStorage(item);
+                                    port.WeightStored -= item.Weight;
+                                    port.VolumeStored -= item.Volume;
+                                    port.Items.Remove(item);
+                                }
+                                atLeastOnePortUnloaded = true;
+                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items from {port.Name} into their FreightPlane.");
+                                break;
                         }
                     }
                 }
             }
 
-            if (!atLeastOnePortUnLoaded)
+            if (!atLeastOnePortUnloaded)
             {
                 Console.WriteLine("----------");
-                Console.WriteLine("No items were unloaded from any ports.");
+                Console.WriteLine("No available port could unload the items.");
             }
         }
 
@@ -362,9 +348,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             foreach(var driver in Drivers)
                 driver.CargoVehicle.Items.Clear();
             foreach (var port in Ports)
-                port.InStorage.Clear();
+                port.Items.Clear();
             foreach (var warehouse in Warehouses)
-                warehouse.InStorage.Clear();
+                warehouse.Items.Clear();
             Console.WriteLine("----------");
             Console.WriteLine("All items returned to suppliers");
         }
@@ -376,7 +362,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             foreach (var driver in Drivers)
             {
                 Console.WriteLine("");
-                Console.WriteLine(driver.CargoVehicle.ToString() + " with current weight in cargo of " + driver.CargoVehicle.CurrentItemsWeightInCargo);
+                Console.WriteLine(driver.CargoVehicle.ToString());
+                Console.WriteLine($"with current weight in cargo of {driver.CargoVehicle.CurrentItemsWeightInCargo}");
             }
 
             Console.WriteLine("----------");
