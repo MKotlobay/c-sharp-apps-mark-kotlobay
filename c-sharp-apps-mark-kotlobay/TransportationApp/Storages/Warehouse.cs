@@ -62,17 +62,10 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
                 double totalWeight = container.Items.Sum(item => item.Weight);
                 double totalVolume = container.Items.Sum(item => item.Volume);
 
-                // Directly add the items from the container to the port's Items list
                 Items.AddRange(container.Items);
-
-                // Update CurrentItemsWeightInCargo (assuming you have access to this property)
                 WeightStored += totalWeight;
                 VolumeStored += totalVolume;
-
-                // Update storage
                 UpdateStorage(totalWeight, totalVolume);
-
-                // Clear the items in the container after unpacking
                 container.ClearItems();
             }
             WeightStored = Math.Round(WeightStored);
@@ -81,6 +74,48 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             Console.WriteLine("Items have been unpacked from containers to the port.");
         }
 
+        public void PackItemsToContainers(IPortable item)
+        {
+            bool itemAdded = false;
+
+            foreach (var container in Containers)
+            {
+                // Check if the container can add the item and still respect its capacity limits
+                if (container.CanAddItem(item) &&
+                    container.Volume + item.Volume <= container.MaxVolume)
+                {
+                    container.AddItem(item);
+                    itemAdded = true;
+
+                    // Update port's weight and volume
+                    WeightStored -= item.Weight;
+                    VolumeStored -= item.Volume;
+                    break;
+                }
+            }
+
+            if (!itemAdded)
+            {
+                // Create a new container if the item couldn't be added to any existing container
+                var newContainer = new Container();
+                newContainer.AddItem(item);
+                Containers.Add(newContainer);
+
+                // Update port's weight and volume
+                WeightStored -= item.Weight;
+                VolumeStored -= item.Volume;
+            }
+            WeightStored = Math.Round(WeightStored);
+            VolumeStored = Math.Round(VolumeStored);
+        }
+
+        public void PackItemsToContainers(List<IPortable> items)
+        {
+            foreach (var item in items)
+            {
+                PackItemsToContainers(item);
+            }
+        }
 
         public void UpdateStorage(double weight, double volume)
         {

@@ -215,3 +215,59 @@ public class Program
             Bus eged = new Bus(792, 3, 110, 40, 2); // Fifth object
         }
  */
+
+/*
+   foreach (var driver in Drivers)
+            {
+                foreach (var port in Ports)
+                {
+                    if (driver.Located == port.Name)
+                    {
+                        switch (driver.CargoVehicle)
+                        {
+                            case CargoShip cargoShip:
+                                port.PackItemsToContainers(port.Items);
+                                if (port.Crane.Unload(port.Containers))
+                                {
+                                    if (cargoShip.Load(port.Containers)== true)
+                                    {
+                                        cargoShip.Containers = port.Containers;
+                                        port.Containers = new List<Container>();
+                                        atLeastOnePortUnloaded = true;
+                                    }
+                                }
+                                break;
+
+                            case FreightTrain freightTrain:
+                                port.PackItemsToContainers(port.Items);
+                                if (port.Crane.Unload(port.Containers))
+                                {
+                                    if (freightTrain.Load(port.Containers) == true)
+                                    {
+                                        freightTrain.Containers = port.Containers;
+                                        port.Containers = new List<Container>();
+                                        atLeastOnePortUnloaded = true;
+                                    }
+                                }
+                                break;
+
+                            case CargoCar cargoCar:
+                                if (cargoCar.Load(port.Items))
+                                {
+                                    cargoCar.Items = port.Items;
+                                    atLeastOnePortUnloaded = true;
+                                }
+                                break;
+
+                            case FreightPlane freightPlane:
+                                if (freightPlane.Load(port.Items))
+                                {
+                                    freightPlane.Items = port.Items;
+                                    atLeastOnePortUnloaded = true;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+ */

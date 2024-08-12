@@ -20,9 +20,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             {
                 Items.Add(item);
                 CurrentItemsWeightInCargo += item.Weight;
-                return true; // Item successfully added
+                return true;
             }
-            return false; // Item could not be added due to weight constraints
+            return false;
         }
 
         public void LoadItemsToStorage(List<IPortable> newItems)

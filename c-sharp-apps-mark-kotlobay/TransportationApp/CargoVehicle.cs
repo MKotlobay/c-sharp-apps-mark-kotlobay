@@ -53,6 +53,18 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             }
         }
 
+        public void WeightInCargoContainers()
+        {
+            foreach(var container in Containers)
+            {
+                foreach(var item in container.Items)
+                {
+                    CurrentItemsWeightInCargo += item.Weight;
+                }
+            }
+            CurrentItemsWeightInCargo = Math.Round(CurrentItemsWeightInCargo);
+        }
+
 
         public void CargoWeightCheck()
         {

@@ -23,7 +23,13 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             BuildCargoApp();
             while (true)
             {
-                Console.WriteLine("Choose num for action: 1 – Choose destination for driver | 2 – All drivers in ports load it! | 3 – All drivers in warehouses load it! | 4 - All ports load to drivers ! | 5 - All warehouses load to drivers ! | 8 - Return to suppliers and remove from ports and warehouses | 9 – Full details of all | 0 - Exit");
+                Console.WriteLine("");
+                Console.WriteLine("Choose num for action:");
+                Console.WriteLine("1 – Choose destination for driver | 2 – All drivers in ports load it!");
+                Console.WriteLine("3 – All drivers in warehouses load it! | 4 - All ports load to drivers !");
+                Console.WriteLine("5 - All warehouses load to drivers ! | 8 - Return to suppliers and remove from ports and warehouses");
+                Console.WriteLine("9 – Full details of all | 0 - Exit");
+                Console.WriteLine("");
                 if (!int.TryParse(Console.ReadLine(), out int num) || num < 0 || num > 9)
                 {
                     Console.WriteLine("----------");
@@ -56,9 +62,14 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                         UnloadAllItemsFromPorts();
                         break;
 
+                    case 5:
+                        UnloadAllItemsFromWarehouses();
+                        break;
+
                     case 8:
                         ReturnAllItemsToSuppliers();
                         break;
+
                     case 9:
                         ShowAllDetails();
                         break;
@@ -230,6 +241,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 Console.WriteLine("----------");
                 Console.WriteLine("No available port could load the items.");
             }
+            else
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("Available ports has been loaded the items.");
+            }
         }
 
         private void LoadItemsInWarehouses()
@@ -282,6 +298,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 Console.WriteLine("----------");
                 Console.WriteLine("No available warehouse could load the items.");
             }
+            else
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("Available warehouse has been loaded the items.");
+            }
         }
 
         private void UnloadAllItemsFromPorts()
@@ -297,28 +318,30 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                         switch (driver.CargoVehicle)
                         {
                             case CargoShip cargoShip:
-                                foreach (var item in port.Items.ToList()) // .ToList() to avoid modifying the collection during iteration
+                                port.PackItemsToContainers(port.Items);
+                                if (port.Crane.Unload(port.Containers))
                                 {
-                                    cargoShip.CreateContainerList(item);
-                                    port.WeightStored -= item.Weight;
-                                    port.VolumeStored -= item.Volume;
-                                    port.Items.Remove(item);
-                                    Console.WriteLine($"Unloaded item with weight {item.Weight} and volume {item.Volume} from port {port.Name}");
+                                    if (cargoShip.Load(port.Containers))
+                                    {
+                                        cargoShip.Containers = port.Containers;
+                                        port.Containers = new List<Container>();
+                                        atLeastOnePortUnloaded = true;
+                                        Console.WriteLine("CargoShip loaded successfully.");
+                                    }
                                 }
-                                atLeastOnePortUnloaded = true;
-                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their CargoShip.");
                                 break;
 
                             case FreightTrain freightTrain:
-                                foreach (var item in port.Items.ToList())
+                                port.PackItemsToContainers(port.Items);
+                                if (port.Crane.Unload(port.Containers))
                                 {
-                                    freightTrain.CreateContainerList(item);
-                                    port.WeightStored -= item.Weight;
-                                    port.VolumeStored -= item.Volume;
-                                    port.Items.Remove(item);
+                                    if (freightTrain.Load(port.Containers))
+                                    {
+                                        freightTrain.Containers = port.Containers;
+                                        port.Containers = new List<Container>(); 
+                                        atLeastOnePortUnloaded = true;
+                                    }
                                 }
-                                atLeastOnePortUnloaded = true;
-                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all containers from {port.Name} into their FreightTrain.");
                                 break;
 
                             case CargoCar cargoCar:
@@ -328,9 +351,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                                     port.WeightStored -= item.Weight;
                                     port.VolumeStored -= item.Volume;
                                     port.Items.Remove(item);
+                                    atLeastOnePortUnloaded = true;
                                 }
-                                atLeastOnePortUnloaded = true;
-                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items from {port.Name} into their CargoCar.");
                                 break;
 
                             case FreightPlane freightPlane:
@@ -340,13 +362,29 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                                     port.WeightStored -= item.Weight;
                                     port.VolumeStored -= item.Volume;
                                     port.Items.Remove(item);
+                                    atLeastOnePortUnloaded = true;
                                 }
-                                atLeastOnePortUnloaded = true;
-                                Console.WriteLine($"Driver {driver.ToString()} has successfully loaded all items from {port.Name} into their FreightPlane.");
                                 break;
                         }
                     }
                 }
+            }
+
+
+            foreach (var driver in Drivers)
+            {
+                if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightTrain)
+                {
+                    driver.CargoVehicle.WeightInCargoContainers();
+                }
+                else
+                    driver.CargoVehicle.WeightInCargoContainers();
+            }
+
+            foreach(var port in Ports)
+            {
+                port.WeightStored = Math.Round(port.WeightStored);
+                port.VolumeStored = Math.Round(port.VolumeStored);
             }
 
             if (!atLeastOnePortUnloaded)
@@ -354,16 +392,129 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                 Console.WriteLine("----------");
                 Console.WriteLine("No available port could unload the items.");
             }
+            else
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("Available ports has been unloaded the items.");
+            }
+        }
+
+        private void UnloadAllItemsFromWarehouses()
+        {
+            bool atLeastOneWarehouseUnloaded = false;
+
+            foreach (var driver in Drivers)
+            {
+                foreach (var warehouse in Warehouses)
+                {
+                    if (driver.Located == warehouse.Name)
+                    {
+                        switch (driver.CargoVehicle)
+                        {
+                            case CargoShip cargoShip:
+                                warehouse.PackItemsToContainers(warehouse.Items);
+                                if (warehouse.Crane.Unload(warehouse.Containers))
+                                {
+                                    if (cargoShip.Load(warehouse.Containers))
+                                    {
+                                        cargoShip.Containers = warehouse.Containers;
+                                        warehouse.Containers = new List<Container>();
+                                        atLeastOneWarehouseUnloaded = true;
+                                        Console.WriteLine($"{driver.CargoVehicle} loaded successfully.");
+                                    }
+                                }
+                                break;
+
+                            case FreightTrain freightTrain:
+                                warehouse.PackItemsToContainers(warehouse.Items);
+                                if (warehouse.Crane.Unload(warehouse.Containers))
+                                {
+                                    if (freightTrain.Load(warehouse.Containers))
+                                    {
+                                        freightTrain.Containers = warehouse.Containers;
+                                        warehouse.Containers = new List<Container>();
+                                        atLeastOneWarehouseUnloaded = true;
+                                        Console.WriteLine($"{driver.CargoVehicle} loaded successfully.");
+                                    }
+                                }
+                                break;
+
+                            case CargoCar cargoCar:
+                                foreach (var item in warehouse.Items.ToList())
+                                {
+                                    cargoCar.LoadItemToStorage(item);
+                                    warehouse.WeightStored -= item.Weight;
+                                    warehouse.VolumeStored -= item.Volume;
+                                    warehouse.Items.Remove(item);
+                                    atLeastOneWarehouseUnloaded = true;
+                                    Console.WriteLine($"{driver.CargoVehicle} loaded successfully.");
+                                }
+                                break;
+
+                            case FreightPlane freightPlane:
+                                foreach (var item in warehouse.Items.ToList())
+                                {
+                                    freightPlane.LoadItemToStorage(item);
+                                    warehouse.WeightStored -= item.Weight;
+                                    warehouse.VolumeStored -= item.Volume;
+                                    warehouse.Items.Remove(item);
+                                    atLeastOneWarehouseUnloaded = true;
+                                    Console.WriteLine($"{driver.CargoVehicle} loaded successfully.");
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+
+
+            foreach (var driver in Drivers)
+            {
+                if (driver.CargoVehicle is CargoShip || driver.CargoVehicle is FreightTrain)
+                {
+                    driver.CargoVehicle.WeightInCargoContainers();
+                }
+                else
+                    driver.CargoVehicle.WeightInCargoContainers();
+            }
+
+            foreach (var warehouse in Warehouses)
+            {
+                warehouse.WeightStored = Math.Round(warehouse.WeightStored);
+                warehouse.VolumeStored = Math.Round(warehouse.VolumeStored);
+            }
+
+            if (!atLeastOneWarehouseUnloaded)
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("No available warehouse could unload the items.");
+            }
+            else
+            {
+                Console.WriteLine("----------");
+                Console.WriteLine("Available warehouses has been unloaded the items.");
+            }
         }
 
         private void ReturnAllItemsToSuppliers()
         {
             foreach(var driver in Drivers)
+            {
                 driver.CargoVehicle.Items.Clear();
+                driver.CargoVehicle.CurrentItemsWeightInCargo = 0;
+            }
             foreach (var port in Ports)
+            {
                 port.Items.Clear();
+                port.Containers.Clear();
+                port.WeightStored = 0;
+            }
             foreach (var warehouse in Warehouses)
+            {
                 warehouse.Items.Clear();
+                warehouse.Containers.Clear();
+                warehouse.WeightStored = 0;
+            }
             Console.WriteLine("----------");
             Console.WriteLine("All items returned to suppliers");
         }

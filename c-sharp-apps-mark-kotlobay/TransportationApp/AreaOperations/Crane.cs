@@ -47,10 +47,6 @@ public class Crane : IContainable
 
     public bool Unload(IPortable item)
     {
-        if (item is Container container)
-        {
-            return UnloadContainer(container);
-        }
         Console.WriteLine("Item is not a valid container.");
         return false;
     }
@@ -62,15 +58,17 @@ public class Crane : IContainable
 
     public bool Unload(List<IPortable> items)
     {
-        foreach (var item in items)
-        {
-            if (!Unload(item))
-            {
-                return false;
-            }
-        }
-        return true;
+        Console.WriteLine("Item is not a valid container.");
+        return false;
     }
+
+    private bool LoadContainer(Container container)
+    {
+        if (container.Weight <= MaxCapacityWeight)
+            return true;
+        return false;
+    }
+
 
     public bool Unload(List<Container> containers)
     {
@@ -82,13 +80,6 @@ public class Crane : IContainable
             }
         }
         return true;
-    }
-
-    private bool LoadContainer(Container container)
-    {
-        if (container.Weight <= MaxCapacityWeight)
-            return true;
-        return false;
     }
 
     private bool UnloadContainer(Container container)
