@@ -7,15 +7,15 @@ using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
 {
-    public interface IContainable
+    public interface IPortable
     {
-        bool Load(IPortable item);
+        bool Load(IContainable item);
         bool Load(Container container);
-        bool Load(List<IPortable> items);
+        bool Load(List<IContainable> items);
         bool Load(List<Container> containers);
-        bool Unload(IPortable item);
+        bool Unload(IContainable item);
         bool Unload(Container container);
-        bool Unload(List<IPortable> items);
+        bool Unload(List<IContainable> items);
         bool Unload(List<Container> containers);
         bool IsReadyToTravel();
     }

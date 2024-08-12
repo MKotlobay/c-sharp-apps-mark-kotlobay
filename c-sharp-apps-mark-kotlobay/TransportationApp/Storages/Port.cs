@@ -69,13 +69,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
                 UpdateStorage(totalWeight, totalVolume);
                 container.ClearItems();
             }
-            WeightStored = Math.Round(WeightStored);
-            VolumeStored = Math.Round(VolumeStored);
 
             Console.WriteLine("Items have been unpacked from containers to the port.");
         }
 
-        public void PackItemsToContainers(IPortable item)
+        public void PackItemsToContainers(IContainable item)
         {
             bool itemAdded = false;
 
@@ -106,11 +104,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
                 WeightStored -= item.Weight;
                 VolumeStored -= item.Volume;
             }
-            WeightStored = Math.Round(WeightStored);
-            VolumeStored = Math.Round(VolumeStored);
         }
 
-        public void PackItemsToContainers(List<IPortable> items)
+        public void PackItemsToContainers(List<IContainable> items)
         {
             foreach (var item in items)
             {

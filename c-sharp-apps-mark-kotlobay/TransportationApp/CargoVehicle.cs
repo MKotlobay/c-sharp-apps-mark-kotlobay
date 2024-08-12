@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
+using c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Storages;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp
 {
-    public abstract class CargoVehicle : IContainable
+    public abstract class CargoVehicle : IPortable
     {
         protected Driver Driver { get; set; }
         protected double MaxWeight { get; set; }
@@ -17,7 +18,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         protected bool CanDrive { get; set; }
         protected bool IsOverWeight { get; set; }
         protected string? NextStorageStructure { get; set; }
-        public List<IPortable> Items { get; set; }
+        public List<IContainable> Items { get; set; }
 
         public List<Container> Containers = new List<Container>();
         protected double ExpectedToPayed { get; set; }
@@ -26,7 +27,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
         public int CurrentDriveID { get; private set; }
         public double CurrentItemsWeightInCargo { get; set; }
 
-        protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
+        protected CargoVehicle(Driver driver, double maxWeight, double maxVolume, List<IContainable> items, string storageStructureParked, string storageStructureToGo)
         {
             Driver = driver;
             MaxWeight = maxWeight;
@@ -53,18 +54,30 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             }
         }
 
-        public void WeightInCargoContainers()
+        public double WeightInCargoContainers()
         {
-            foreach(var container in Containers)
+            foreach (var container in Containers)
             {
-                foreach(var item in container.Items)
+                foreach (var item in container.Items)
                 {
                     CurrentItemsWeightInCargo += item.Weight;
                 }
             }
-            CurrentItemsWeightInCargo = Math.Round(CurrentItemsWeightInCargo);
+            return CurrentItemsWeightInCargo;
         }
 
+        public double VolumeInCargoContainers()
+        {
+            double tempVolume = 0;
+            foreach (var container in Containers)
+            {
+                foreach (var item in container.Items)
+                {
+                    tempVolume += item.Volume;
+                }
+            }
+            return tempVolume;
+        }
 
         public void CargoWeightCheck()
         {
@@ -75,24 +88,22 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
 
         public double ToPayed()
         {
-            double totalWeight = Items.Sum(c => c.Weight);
-            double volume = Items.Sum(c => c.Volume);
             int distance = 2000; // 2000 km
             double cost = 0.0;
 
             switch (Driver.VehicleType)
             {
                 case DriverType.CargoCar:
-                    cost = distance * volume * totalWeight;
+                    cost = distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
                     break;
                 case DriverType.FreightTrain:
-                    cost = 5 * distance * volume * totalWeight;
+                    cost = 5 * distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
                     break;
                 case DriverType.CargoShip:
-                    cost = 20 * distance * volume * totalWeight;
+                    cost = 20 * distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
                     break;
                 case DriverType.FreightPlane:
-                    cost = 50 * distance * volume * totalWeight;
+                    cost = 50 * distance * VolumeInCargoContainers() * CurrentItemsWeightInCargo;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported vehicle type");
@@ -100,7 +111,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             return cost;
         }
 
-        protected virtual bool CanLoad(IPortable item)
+        protected virtual bool CanLoad(IContainable item)
         {
             double currentWeight = Items.Sum(c => c.Weight);
             double currentVolume = Items.Sum(c => c.Volume);
@@ -108,7 +119,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             return (currentWeight + item.Weight <= MaxWeight) && (currentVolume + item.Volume <= MaxVolume);
         }
 
-        public bool Load(IPortable item)
+        public bool Load(IContainable item)
         {
             if (CanLoad(item))
             {
@@ -119,7 +130,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             return false;
         }
 
-        public bool Load(List<IPortable> items)
+        public bool Load(List<IContainable> items)
         {
             bool allLoaded = true;
             foreach (var item in items)
@@ -132,7 +143,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             return allLoaded;
         }
 
-        public bool Unload(IPortable item)
+        public bool Unload(IContainable item)
         {
             if (Items.Remove(item))
             {
@@ -142,7 +153,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
             return false;
         }
 
-        public bool Unload(List<IPortable> items)
+        public bool Unload(List<IContainable> items)
         {
             bool allRemoved = true;
             foreach (var item in items)

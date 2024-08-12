@@ -15,14 +15,14 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
     {
         public string Name { get; }
         public string SureName { get; }
-        protected string Id { get; }
+        public string Id { get; }
         public DriverType VehicleType { get; private set; }
         public string? Destination { get; private set; }
         public bool IsOnWay { get; private set; }
         public string Located { get; set; }
         public CargoVehicle CargoVehicle { get; }
 
-        public Driver(string name, string sureName, string id, DriverType vehicleLicence, string locationNow, List<IPortable> items)
+        public Driver(string name, string sureName, string id, DriverType vehicleLicence, string locationNow, List<IContainable> items)
         {
             Name = name;
             SureName = sureName;
@@ -51,7 +51,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp
                     break;
             }
         }
-        private CargoVehicle CreateVehicle(DriverType vehicleType, List<IPortable> items)
+        private CargoVehicle CreateVehicle(DriverType vehicleType, List<IContainable> items)
         {
             switch (vehicleType)
             {

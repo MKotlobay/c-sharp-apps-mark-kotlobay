@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
 {
-    public class Container : IPortable
+    public class Container : IContainable
     {
         public int Number { get; private set; }
         public string ContainerType { get; set; }
@@ -17,7 +17,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
         public double Height { get; set; }
         public double MaxVolume { get; }
         public double Volume { get; set; }
-        public List<IPortable> Items { get; set; }
+        public List<IContainable> Items { get; set; }
         public double Weight { get; set; }
         public double Price { get; set; }
 
@@ -28,11 +28,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
             Height = 2.59;
             MaxVolume = Length * Width * Height;
             Volume = 0;
-            Items = new List<IPortable>();
+            Items = new List<IContainable>();
             Weight = 0;
         }
 
-        public bool CanAddItem(IPortable item)
+        public bool CanAddItem(IContainable item)
         {
             return (Weight + item.Weight <= 30000) && (Volume + item.Volume < MaxVolume);
         }
@@ -46,7 +46,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
             Console.WriteLine($"Container with containing items price of it is {Price}");
         }
 
-        public void AddItem(IPortable item)
+        public void AddItem(IContainable item)
         {
             if (CanAddItem(item))
             {
@@ -65,7 +65,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations
             }
         }
 
-        public bool RemoveItem(IPortable item)
+        public bool RemoveItem(IContainable item)
         {
             bool removed = Items.Remove(item);
             if (removed)

@@ -12,7 +12,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
     public class FreightTrain : CargoVehicle
     {
 
-        public FreightTrain(Driver driver, double maxWeight, double maxVolume, List<IPortable> items, string storageStructureParked, string storageStructureToGo)
+        public FreightTrain(Driver driver, double maxWeight, double maxVolume, List<IContainable> items, string storageStructureParked, string storageStructureToGo)
             : base(driver, maxWeight, maxVolume, items, storageStructureParked, storageStructureToGo)
         {
             CreateContainerList(items);
@@ -20,7 +20,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             CurrentItemsWeightInCargo = Containers.Sum(c => c.Items.Sum(i => i.Weight));
         }
 
-        public void CreateContainerList(IPortable item)
+        public void CreateContainerList(IContainable item)
         {
             bool itemAdded = false;
 
@@ -44,7 +44,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             }
         }
 
-        public void CreateContainerList(List<IPortable> items)
+        public void CreateContainerList(List<IContainable> items)
         {
             foreach (var item in items)
             {
@@ -52,9 +52,9 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.CargoTransports
             }
         }
 
-        public List<IPortable> ContainersToItemsList()
+        public List<IContainable> ContainersToItemsList()
         {
-            List<IPortable> items = new List<IPortable>();
+            List<IContainable> items = new List<IContainable>();
             foreach (var container in Containers)
             {
                 items.AddRange(container.Items);

@@ -18,7 +18,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
         protected double CapacityVolume { get; set; }
         public double WeightStored { get; set; }
         public double VolumeStored { get; set; }
-        public List<IPortable> Items { get; set; }
+        public List<IContainable> Items { get; set; }
         public List<Container> Containers { get; private set; }
 
         protected StorageStructure(string country, string city, string street, int number, double capacityWeight, double capacityVolume)
@@ -31,11 +31,11 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             CapacityVolume = capacityVolume;
             WeightStored = 0;
             VolumeStored = 0;
-            Items = new List<IPortable>();
+            Items = new List<IContainable>();
             Containers = new List<Container>();
         }
 
-        public virtual void Load(List<IPortable> items)
+        public virtual void Load(List<IContainable> items)
         {
             if (LoadCheck(items) == true)
             {
@@ -51,7 +51,7 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             }
         }
 
-        public bool LoadCheck(List<IPortable> items)
+        public bool LoadCheck(List<IContainable> items)
         {
             double totalWeight = items.Sum(item => item.Weight);
             double totalVolume = items.Sum(item => item.Volume);
@@ -59,8 +59,8 @@ namespace c_sharp_apps_mark_kotlobay.TransportationApp.Storages
             // Check if there is enough capacity to load the items
             if (WeightStored + totalWeight <= CapacityWeight && VolumeStored + totalVolume <= CapacityVolume)
             {
-                WeightStored += Math.Round(totalWeight);
-                VolumeStored += Math.Round(totalVolume);
+                WeightStored += totalWeight;
+                VolumeStored += totalVolume;
                 return true; // Items can be loaded
             }
             return false; // Not enough capacity to load items

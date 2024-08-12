@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace c_sharp_apps_mark_kotlobay.TransportationApp.Items
 {
-    public interface IPortable
+    public interface IContainable
     {
         double Length { get; set; }
         double Width { get; set; }

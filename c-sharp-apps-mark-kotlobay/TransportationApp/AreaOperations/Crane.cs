@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using c_sharp_apps_mark_kotlobay.TransportationApp.AreaOperations;
 using c_sharp_apps_mark_kotlobay.TransportationApp.Items;
 
-public class Crane : IContainable
+public class Crane : IPortable
 {
     public double MaxCapacityWeight { get; private set; }
     public double MaxCapacityVolume { get; private set; }
@@ -18,12 +18,12 @@ public class Crane : IContainable
         CurrentVolume = 0; // Current volume for container
     }
 
-    public bool Load(IPortable item)
+    public bool Load(IContainable item)
     {
         return false;
     }
 
-    public bool Load(List<IPortable> items)
+    public bool Load(List<IContainable> items)
     {
         return false;
     }
@@ -45,7 +45,7 @@ public class Crane : IContainable
         return true;
     }
 
-    public bool Unload(IPortable item)
+    public bool Unload(IContainable item)
     {
         Console.WriteLine("Item is not a valid container.");
         return false;
@@ -56,7 +56,7 @@ public class Crane : IContainable
         return UnloadContainer(container);
     }
 
-    public bool Unload(List<IPortable> items)
+    public bool Unload(List<IContainable> items)
     {
         Console.WriteLine("Item is not a valid container.");
         return false;
